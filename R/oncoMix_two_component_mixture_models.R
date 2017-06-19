@@ -99,7 +99,7 @@ selectivityIndex <- function(mmParams, dfNml){
 
 scatterMixPlot <- function(mixModelParams){
   mmParams = t(mmParams)
-  x = ggplot(data = as.data.frame(mmParams), aes(x = deltaMu2, y = 1/(abs(deltaMu1) + 0.1))) + theme_classic() + geom_point()  
+  x = ggplot2::ggplot(data = as.data.frame(mmParams), aes(x = deltaMu2, y = 1/(abs(deltaMu1) + 0.1))) + theme_classic() + geom_point()  
   print(x)
   return(x)
 }
