@@ -117,7 +117,7 @@ scatterMixPlot <- function(mixModelParams){
     xlab(expression(paste(Delta, mu[2]))) + 
     ylab(expression(paste(frac(1, paste(Delta, mu[1], " + ", alpha))))) +
     ggtitle(bquote(Distribution~of~Mixture~Model~Parameters*","~alpha~"="~.(round(alpha1,2))))
-  print(x)
+  #print(x)
   return(x)
 }
 

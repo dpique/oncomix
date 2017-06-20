@@ -23,7 +23,7 @@ This tutorial will demonstrate how to identify oncogene candidates from a set of
 The advent of large, well-curated databases (such as the [genomic data commons](https://gdc.cancer.gov/) and [oncomine](https://www.oncomine.org/)) that contain RNA sequencing data from hundreds of patient tumors has made it possible to identify oncogene candidates based off of mRNA expression alone. A definition for oncogenes has also been proposed based on mutation calls from high-throughput DNA sequencing data in tumors. Specifically, an oncogene is a gene that is recurrently mutated in 20% or more of patient samples (see Vogelstein et al, Science, 2013). Other attempts at identifying oncogenes from gene expression data include COPA, which identifies translocations from microarray data, and mCOPA, a derivative of COPA that is more flexible and that can identify outlier genes. However, no methods have been developed to identify oncogenes from RNA-sequencing data.
 
 ```{r}
-#devtools::install_github("dpique/oncoMix1")
+#devtools::install_github("dpique/oncomix")
 library(oncomix)
 ```
 
@@ -44,10 +44,10 @@ The teal curves represent the probability distribution (PD) over expression valu
 data(dfNmlIsof, dfTumorIsof, package="oncomix")
 
 dim(dfNmlIsof)
-dfNmlIsof[1:5, 1:5]
+dfNmlIsof[1:5, 1:5] #take a look at the matrix of mRNA expression data from adjacent normal samples
 
 dim(dfTumorIsof)
-dfTumorIsof[1:5, 1:5]
+dfTumorIsof[1:5, 1:5] #take a look at the matrix of mRNA expression data from tumors
 
 mmParams = mixModelParams(dfNmlIsof, dfTumorIsof) #will take a few mins
 head(mmParams)
@@ -57,24 +57,15 @@ head(mmParams)
 ## Visualize the output
 
 ```{r}
-mixModelParams = mmParams
 scatterMixPlot(mmParams)
 ```
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
-```{r cars}
-summary(cars)
+##highlight the isoforms with a selectivity index greater than .99
+#show the selectivity index.
+
+```{r, fig.width = 8, fig.height= 5}
+scatterMixPlot(mmParams)
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
