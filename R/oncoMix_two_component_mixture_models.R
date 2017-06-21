@@ -98,7 +98,7 @@ selectivityIndex <- function(mmParams, dfNml){
 #' scatterMixPlot(mixModelParams)
 #' @seealso \code{\link{mixModelParams}} 
 
-scatterMixPlot <- function(mixModelParams){
+scatterMixPlot <- function(mixModelParams, selIndThresh = 1){
   mixModelParams = as.data.frame(mixModelParams)
   one_over_alpha = diff(range(mixModelParams$deltaMu2))
   alpha1 = 1/one_over_alpha
@@ -115,9 +115,20 @@ scatterMixPlot <- function(mixModelParams){
     geom_vline(xintercept = deltaMu2Quant, col = colors_red, size = c(1,1,1,1,1)) +
     geom_point(alpha= 0.5) + 
     xlab(expression(paste(Delta, mu[2]))) + 
-    ylab(expression(paste(frac(1, paste(Delta, mu[1], " + ", alpha))))) +
-    ggtitle(bquote(Distribution~of~Mixture~Model~Parameters*","~alpha~"="~.(round(alpha1,2))))
+    ylab(expression(paste(frac(1, paste(Delta, mu[1], " + ", alpha))))) 
   #print(x)
+
+  if(selIndThresh < 1){
+    mixModelParams.si = mixModelParams[mixModelParams$SI > selIndThresh,]
+    x = x + geom_point(data = as.data.frame(mixModelParams.si), 
+                       aes(x = deltaMu2, y = 1/(abs(deltaMu1)+alpha1)), 
+                       size = 10, alpha=0.1, 
+                       col=colors_red[length(colors_red)], 
+                       fill=colors_red[length(colors_red)]) +
+      ggtitle(bquote(Distribution~of~Mixture~Model~Parameters*","~alpha~"="~.(round(alpha1,2))*", SI >"~.(selIndThresh)))
+  } else {
+    x = x + ggtitle(bquote(Distribution~of~Mixture~Model~Parameters*","~alpha~"="~.(round(alpha1,2))))
+  }
   return(x)
 }
 

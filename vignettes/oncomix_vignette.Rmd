@@ -24,6 +24,13 @@ The advent of large, well-curated databases (such as the [genomic data commons](
 
 ```{r}
 #devtools::install_github("dpique/oncomix")
+#setwd("\\\\data.einstein.yu.edu/home/dpique/dpLabNotebook/bimodality_brca_tcga/oncomix")
+#library(devtools)
+#install_github("dpique/oncomix")
+#install.packages("oncomix")
+#vignette("oncomix_vignette")
+
+#remove.packages("oncomix")
 library(oncomix)
 ```
 
@@ -56,16 +63,23 @@ head(mmParams)
 
 ## Visualize the output
 
-```{r}
+```{r, fig.width = 7, fig.height= 6.5}
 scatterMixPlot(mmParams)
 ```
 
 
 
-##highlight the isoforms with a selectivity index greater than .99
-#show the selectivity index.
+##Now, highlight the isoforms with a selectivity index greater than .99
 
-```{r, fig.width = 8, fig.height= 5}
-scatterMixPlot(mmParams)
+```{r, fig.width = 7, fig.height= 6.5}
+scatterMixPlot(mmParams, selIndThresh = .99)
+```
+
+##Create a clickable app that shows the identity of each isoform (and also its distribution in a pop-out menu). Create an option to show known oncogenic isoforms.
+```{r}
+library(shiny)
+#runExample("01_hello")
+#runExample("02_text")
+#runExample("03_reactivity")
 ```
 
