@@ -22,4 +22,3 @@ oncoMixBimodal(means = c(3,10))
 \keyword{idealized,}
 \keyword{oncoMix,}
 \keyword{theoretical,}
-

@@ -19,4 +19,3 @@ oncoMixIdeal(oe_means = c(2,18.5))
 \keyword{idealized,}
 \keyword{oncoMix,}
 \keyword{theoretical}
-

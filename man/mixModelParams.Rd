@@ -12,11 +12,11 @@ mixModelParams(dfNml, dfTumor)
 \item{dfTumor}{A dataframe of tumor data containing patients as rows and genes as columns}
 }
 \value{
-Returns a list of length 2, each element of which contains the parameters 
+Returns a list of length 2, each element of which contains the parameters
 for the Normal or the Tumor data in a 3 x n matrix, where n is the number of patient samples
 }
 \description{
-This function allows you to generate the parameters for two 2-component Gaussian mixture model 
+This function allows you to generate the parameters for two 2-component Gaussian mixture model
 with equal variances from 2 matrices of data with a priori labels (eg tumor vs normal.) This application
 was originally intended for matrices of gene expression data treated with 2 conditions.
 }
@@ -34,4 +34,3 @@ mmParams = mixModelParams(dfNml, dfTumor)
 \keyword{mixture-model,}
 \keyword{oncoMix,}
 \keyword{two-component}
-

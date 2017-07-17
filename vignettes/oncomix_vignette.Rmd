@@ -2,7 +2,10 @@
 title: "OncoMix Vignette"
 author: "Daniel Piqué"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output:
+  html_document:
+    toc: true
+    toc_float: true
 vignette: >
   %\VignetteIndexEntry{OncoMix Vignette}
   %\VignetteEngine{knitr::rmarkdown}
@@ -10,17 +13,16 @@ vignette: >
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning = F)
 ```
  
 ## Introduction
 
-OncoMix is an R package for identifying oncogene candidates based off of 2-component Gaussian mixture models. It estimates parameters using EM as implemented in mclust.
-This tutorial will demonstrate how to identify oncogene candidates from a set of mRNA sequencing data.
+OncoMix is an R package for identifying oncogene candidates based off of 2-component Gaussian mixture models. It estimates parameters using the expectation maximization procedure as implemented in the R package mclust. This tutorial will demonstrate how to identify oncogene candidates from a set of mRNA sequencing data.
 
 
 
-The advent of large, well-curated databases (such as the [genomic data commons](https://gdc.cancer.gov/) and [oncomine](https://www.oncomine.org/)) that contain RNA sequencing data from hundreds of patient tumors has made it possible to identify oncogene candidates based off of mRNA expression alone. A definition for oncogenes has also been proposed based on mutation calls from high-throughput DNA sequencing data in tumors. Specifically, an oncogene is a gene that is recurrently mutated in 20% or more of patient samples (see Vogelstein et al, Science, 2013). Other attempts at identifying oncogenes from gene expression data include COPA, which identifies translocations from microarray data, and mCOPA, a derivative of COPA that is more flexible and that can identify outlier genes. However, no methods have been developed to identify oncogenes from RNA-sequencing data.
+The advent of large, well-curated databases, such as the [genomic data commons](https://gdc.cancer.gov/), that contain RNA sequencing data from hundreds of patient tumors has made it possible to identify oncogene candidates based off of mRNA expression alone. The method proposed here is the first developed to identify oncogenes from RNA-sequencing data in large cohorts of patients.
 
 ```{r}
 #devtools::install_github("dpique/oncomix")
@@ -34,7 +36,7 @@ The advent of large, well-curated databases (such as the [genomic data commons](
 library(oncomix)
 ```
 
-## What do we expect an oncogene to look like?
+### What do we expect an oncogene to look like?
 
 ```{r}
 library(ggplot2)
@@ -42,9 +44,9 @@ oncomix::oncoMixIdeal()
 
 ```
 
-The teal curves represent the probability distribution (PD) over expression values from a single gene obtained from multiple tumors samples. The red-orange curves represent the PD over expression values from the same gene obtained from multiple adjacent normal tissue samples. In other words, there is a *subgroup* of tumors that overexpresses this gene relative to normal tissue.
+The teal curves represent the probability distribution (PD) over expression values from a single gene obtained from multiple tumors samples. The red-orange curves represent the PD over expression values from the same gene obtained from multiple adjacent normal tissue samples. Visually, we see that for a theoretical oncogene, there is a *subgroup* of tumors that overexpresses this gene relative to normal tissue.
 
-## Identifying Oncogenes 
+## Identify Oncogene Candidates 
 
 
 ```{r}
@@ -56,7 +58,7 @@ dfNmlIsof[1:5, 1:5] #take a look at the matrix of mRNA expression data from adja
 dim(dfTumorIsof)
 dfTumorIsof[1:5, 1:5] #take a look at the matrix of mRNA expression data from tumors
 
-mmParams = mixModelParams(dfNmlIsof, dfTumorIsof) #will take a few mins
+mmParams = oncomix::mixModelParams(dfNmlIsof[,1:500], dfTumorIsof[,1:500]) #fits the mixture models, will take a few mins
 head(mmParams)
 ```
 
@@ -69,13 +71,25 @@ scatterMixPlot(mmParams)
 
 
 
-##Now, highlight the isoforms with a selectivity index greater than .99
+- Now, highlight the isoforms with a selectivity index greater than .99
 
 ```{r, fig.width = 7, fig.height= 6.5}
 scatterMixPlot(mmParams, selIndThresh = .99)
 ```
 
-##Create a clickable app that shows the identity of each isoform (and also its distribution in a pop-out menu). Create an option to show known oncogenic isoforms.
+
+-  Show the distribution of the selectivity index across all isoforms
+```{r}
+library(ggplot2)
+qplot(mmParams[,"SI"]) + geom_rug(alpha = 0.1) + theme_classic() + xlab("Selectivity Index")
+
+```
+
+
+- Create a histogram of an individual gene with the curves superimposed
+
+
+### Create a clickable app that shows the identity of each isoform (and also its distribution in a pop-out menu). Create an option to show known oncogenic isoforms.
 ```{r}
 library(shiny)
 #runExample("01_hello")

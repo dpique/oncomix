@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "---\ntitle: \"OncoMix Vignette\"\nauthor: \"Daniel Piqué\"\ndate: \"`r Sys.Date()`\"\noutput:\n  html_document:\n    toc: true\n    toc_float: true\nvignette: >\n  %\\VignetteIndexEntry{OncoMix Vignette}\n  %\\VignetteEngine{knitr::rmarkdown}\n  \\usepackage[utf8]{inputenc}\n---\n\n```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE, warning = F)\n```\n \n## Introduction\n\nOncoMix is an R package for identifying oncogene candidates based off of 2-component Gaussian mixture models. It estimates parameters using the expectation maximization procedure as implemented in the R package mclust. This tutorial will demonstrate how to identify oncogene candidates from a set of mRNA sequencing data.\n\n\n\nThe advent of large, well-curated databases, such as the [genomic data commons](https://gdc.cancer.gov/), that contain RNA sequencing data from hundreds of patient tumors has made it possible to identify oncogene candidates based off of mRNA expression alone. The method proposed here is the first developed to identify oncogenes from RNA-sequencing data in large cohorts of patients.\n\n```{r}\n#devtools::install_github(\"dpique/oncomix\")\n#setwd(\"\\\\\\\\data.einstein.yu.edu/home/dpique/dpLabNotebook/bimodality_brca_tcga/oncomix\")\n#library(devtools)\n#install_github(\"dpique/oncomix\")\n#install.packages(\"oncomix\")\n#vignette(\"oncomix_vignette\")\n\n#remove.packages(\"oncomix\")\nlibrary(oncomix)\n```\n\n### What do we expect an oncogene to look like?\n\n```{r}\nlibrary(ggplot2)\noncomix::oncoMixIdeal()\n\n```\n\nThe teal curves represent the probability distribution (PD) over expression values from a single gene obtained from multiple tumors samples. The red-orange curves represent the PD over expression values from the same gene obtained from multiple adjacent normal tissue samples. Visually, we see that for a theoretical oncogene, there is a *subgroup* of tumors that overexpresses this gene relative to normal tissue.\n\n## Identify Oncogene Candidates \n\n\n```{r}\ndata(dfNmlIsof, dfTumorIsof, package=\"oncomix\")\n\ndim(dfNmlIsof)\ndfNmlIsof[1:5, 1:5] #take a look at the matrix of mRNA expression data from adjacent normal samples\n\ndim(dfTumorIsof)\ndfTumorIsof[1:5, 1:5] #take a look at the matrix of mRNA expression data from tumors\n\nmmParams = oncomix::mixModelParams(dfNmlIsof[,1:500], dfTumorIsof[,1:500]) #fits the mixture models, will take a few mins\nhead(mmParams)\n```\n\n\n## Visualize the output\n\n```{r, fig.width = 7, fig.height= 6.5}\nscatterMixPlot(mmParams)\n```\n\n\n\n- Now, highlight the isoforms with a selectivity index greater than .99\n\n```{r, fig.width = 7, fig.height= 6.5}\nscatterMixPlot(mmParams, selIndThresh = .99)\n```\n\n\n-  Show the distribution of the selectivity index across all isoforms\n```{r}\nlibrary(ggplot2)\nqplot(mmParams[,\"SI\"]) + geom_rug(alpha = 0.1) + theme_classic() + xlab(\"Selectivity Index\")\n\n```\n\n\n- Create a histogram of an individual gene with the curves superimposed\n\n\n### Create a clickable app that shows the identity of each isoform (and also its distribution in a pop-out menu). Create an option to show known oncogenic isoforms.\n```{r}\nlibrary(shiny)\n#runExample(\"01_hello\")\n#runExample(\"02_text\")\n#runExample(\"03_reactivity\")\n```\n\n",
+    "created" : 1500306026735.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "922961501",
+    "id" : "8AF56C85",
+    "lastKnownWriteTime" : 1500309662,
+    "last_content_update" : 1500309663444,
+    "path" : "//data.einstein.yu.edu/home/dpique/dpLabNotebook/bimodality_brca_tcga/oncomix/vignettes/oncomix_vignette.Rmd",
+    "project_path" : "vignettes/oncomix_vignette.Rmd",
+    "properties" : {
+        "last_setup_crc32" : "4349667261cfe64a"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

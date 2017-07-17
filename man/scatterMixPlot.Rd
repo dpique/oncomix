@@ -14,7 +14,7 @@ and deltaMu1 rows}
 Returns a ggplot object that you can plot
 }
 \description{
-This function allows you to generate the parameters for two 2-component mixture models 
+This function allows you to generate the parameters for two 2-component mixture models
 with equal variances
 }
 \examples{
@@ -26,4 +26,3 @@ scatterMixPlot(mixModelParams)
 \keyword{oncoMix,}
 \keyword{two-component}
 \keyword{visualization,}
-
