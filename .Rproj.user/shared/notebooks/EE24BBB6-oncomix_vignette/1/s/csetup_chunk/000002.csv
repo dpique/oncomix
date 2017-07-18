@@ -1,2 +1,1 @@
-"2","The working directory was changed to //data.einstein.yu.edu/home/dpique/dpLabNotebook/bimodality_brca_tcga/oncomix/vignettes inside a notebook chunk. The working directory will be reset when the chunk is finished running. Use the knitr root.dir option in the setup chunk to change the the working directory for notebook chunks."
 "0","knitr::opts_chunk$set(echo = TRUE, warning = F)"

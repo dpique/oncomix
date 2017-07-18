@@ -5,7 +5,9 @@ date: "`r Sys.Date()`"
 output:
   html_document:
     toc: true
-    toc_float: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
 vignette: >
   %\VignetteIndexEntry{OncoMix Vignette}
   %\VignetteEngine{knitr::rmarkdown}
@@ -36,7 +38,7 @@ The advent of large, well-curated databases, such as the [genomic data commons](
 library(oncomix)
 ```
 
-### What do we expect an oncogene to look like?
+### What do we expect the distribution of an oncogene expression in a population to look like?
 
 ```{r}
 library(ggplot2)
@@ -48,6 +50,7 @@ The teal curves represent the probability distribution (PD) over expression valu
 
 ## Identify Oncogene Candidates 
 
+Now, we will load at an example dataset that contains expression values for 4789 mRNA  isoforms obtained from paired samples of breast tumor (`dfTumorIsof`) and adjacent normal(`dfNmlIsof`) breast tissue from 113 patients. We will fit the mixture model using the oncomix function `mixModelParams`, which takes dataframes that contain patients as rows and mRNA isoforms/genes as columns. The number of columns (genes) should be the same between both dataframes, though the number of rows can vary. 
 
 ```{r}
 data(dfNmlIsof, dfTumorIsof, package="oncomix")
@@ -62,13 +65,37 @@ mmParams = oncomix::mixModelParams(dfNmlIsof[,1:500], dfTumorIsof[,1:500]) #fits
 head(mmParams)
 ```
 
+The object returned by `mixModelParams` is a matrix with rows corresponding to genes and 11 columns containing mixture model parameters. The meaning of the matrix columns are described below:
+
+  - `n.mu.1` = the mean ($\mu$) of the Gaussian curve with the smaller mean fit to the adjacent normal expression data 
+  - `n.mu.2` = the mean ($\mu$) of the Gaussian curve with the larger mean fit to the adjacent normal expression data 
+  - `n.var` = the variance ($\sigma$) of the two Gaussian curves fit to the adjacent normal expression data (fixed to be equal between the two curves)
+  - `n.pi.1` = the proportion of adjacent normal samples assigned to the Gaussian curve with mean `n.mu.1`
+  
+  - `t.mu.1` = the mean ($\mu$) of the Gaussian curve with the smaller mean fit to the tumor expression data 
+  - `t.mu.2` = the mean ($\mu$) of the Gaussian curve with the larger mean fit to the tumor expression data. Greater than 0 for sets of expression data with all values $\geq0$.
+  - `t.var` = the variance ($\sigma$) of the two Gaussian curves fit to the tumor expression data (fixed to be equal between the two curves). Greater than 0.
+  - `t.pi.1` = the proportion of tumor samples assigned to the Gaussian curve with mean `t.mu.1`. Between 0-1
+  
+  - `deltaMu2` = the difference between the means of the two curves between groups. `t.mu.2` - `n.mu.2`. May be negative or positive.  
+  - `deltaMu1` = the difference between the means of the two curves between groups. `t.mu.1` - `n.mu.1`. May be negative or positive. 
+  - `SI` = the selectivity index, or the proportion of adjacent normal samples with expression values less than the boundary defined by `t.mu.2` - `t.mu.1`. The selectivity index for the ith gene is computed as:
+ 
+ $$SI_i  = \frac{1}{N}\sum_{j=1}^N \Bigg\{ \begin{array}{ll} 1,~ if~x_{ij} < \frac{\mu_{iLT}+\mu_{iHT}}{2}  \\ 
+ 0, ~ otherwise 
+                  \end{array},
+ $$
+
+  - where $N$ is the number of adjacent normal samples, and $x_{ij}$ is the expression value of the ith gene in the jth adjacent normal sample. $\mu_{iHT}$ is the mean of higher/larger Gaussian from the ith gene in tumor samples, and $\mu_{iLT}$ is the mean of the smaller/lower Gaussian from the ith gene in the tumor samples.
+  
 
 ## Visualize the output
+
+- We will show a scatterplot with the axes corresponding to the differences between component means. The x axis corresponds to the difference between the means of the curves with the larger Gaussians (`deltaMu2`), and the y axis corresponds to the difference between the means of the curves with the smaller Gaussians (`deltaMu1`) between the two treatments.
 
 ```{r, fig.width = 7, fig.height= 6.5}
 scatterMixPlot(mmParams)
 ```
-
 
 
 - Now, highlight the isoforms with a selectivity index greater than .99
@@ -77,19 +104,27 @@ scatterMixPlot(mmParams)
 scatterMixPlot(mmParams, selIndThresh = .99)
 ```
 
-
 -  Show the distribution of the selectivity index across all isoforms
+
 ```{r}
 library(ggplot2)
 qplot(mmParams[,"SI"]) + geom_rug(alpha = 0.1) + theme_classic() + xlab("Selectivity Index")
 
 ```
 
+- Now, visualize the distribution of gene expression values for a particular isoform, . Specifically, we will create a overlapping histogram of an single isoforms's expression values across both tumor (teal) and adjacent normal (red) samples with the best-fitting Gaussian curves superimposed.
 
-- Create a histogram of an individual gene with the curves superimposed
+```{r}
+#isof = "uc002jxc.2"
+isof = "uc001voq.1"
+plotGeneHist(mmParams, dfNmlIsof, dfTumorIsof, isof)
+
+```
 
 
-### Create a clickable app that shows the identity of each isoform (and also its distribution in a pop-out menu). Create an option to show known oncogenic isoforms.
+### Applet
+
+- Create a clickable app that shows the identity of each isoform (and also its distribution in a pop-out menu). Create an option to show known oncogenic isoforms.
 ```{r}
 library(shiny)
 #runExample("01_hello")

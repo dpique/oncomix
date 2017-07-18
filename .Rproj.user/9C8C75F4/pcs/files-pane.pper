@@ -1,0 +1,9 @@
+{
+    "path" : "//data.einstein.yu.edu/home/dpique/dpLabNotebook/bimodality_brca_tcga/oncomix",
+    "sortOrder" : [
+        {
+            "ascending" : true,
+            "columnIndex" : 2
+        }
+    ]
+}

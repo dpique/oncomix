@@ -10,18 +10,18 @@
 #' oncoMixIdeal(oe_means = c(2,18.5))
 
 oncoMixIdeal <- function(oe_means=c(3,7)){
-  ggplot(data.frame(cbind(expr = c(rnorm(113, 3), c(rnorm(56,3), rnorm(57, mean =6)))), type=c(rep(2, 113), rep(1,113))), 
-         aes(x=expr, color=as.factor(type), fill=as.factor(type), group=as.factor(type))) + 
-  theme_classic() + 
+  ggplot(data.frame(cbind(expr = c(rnorm(113, 3), c(rnorm(56,3), rnorm(57, mean =6)))), type=c(rep(2, 113), rep(1,113))),
+         aes(x=expr, color=as.factor(type), fill=as.factor(type), group=as.factor(type))) +
+  theme_classic() +
   theme(axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank(),
-        legend.position = "none", plot.title = element_text(size = 12), axis.text=element_text(size=8), 
-        axis.title=element_text(size=8), axis.title.x=element_blank(), axis.text.x=element_blank(), 
-        axis.ticks.x=element_blank()) + 
-  ggtitle("Theoretical") + xlim(oe_means[1]-3.2,oe_means[2] + 3) + 
-  stat_function(fun = dnorm, colour = "#F8766D", args = list(mean = 3.1, sd=0.7), size=5) + 
-  stat_function(fun = dnorm, colour = "#F8766D", args = list(mean=2.9, sd=0.7), size = 5) +
-  stat_function(fun = dnorm, colour = "#00BFC4", args = list(mean = oe_means[1], sd=1), size = 5) + 
-  stat_function(fun = dnorm, colour = "#00BFC4", args = list(mean = oe_means[2], sd=1), size = 5)
+        legend.position = "none", plot.title = element_text(size = 12), axis.text=element_text(size=8),
+        axis.title=element_text(size=8), axis.title.x=element_blank(), axis.text.x=element_blank(),
+        axis.ticks.x=element_blank()) +
+  ggtitle("Theoretical") + xlim(oe_means[1]-3.2,oe_means[2] + 3) +
+  stat_function(fun = dnorm, colour = "#F8766D", args = list(mean = 3.1, sd=0.7), size=3) +
+  stat_function(fun = dnorm, colour = "#F8766D", args = list(mean=2.9, sd=0.7), size = 3) +
+  stat_function(fun = dnorm, colour = "#00BFC4", args = list(mean = oe_means[1], sd=1), size = 3) +
+  stat_function(fun = dnorm, colour = "#00BFC4", args = list(mean = oe_means[2], sd=1), size = 3)
 }
 
 #' Creating an schematic of a 2-component mixture model
@@ -36,10 +36,10 @@ oncoMixIdeal <- function(oe_means=c(3,7)){
 
 oncoMixBimodal <- function(oe_means=c(3,7)){
   #library(ggplot2)
-  ggplot(data.frame(cbind(expr = c(rnorm(113, 3), c(rnorm(56,3), rnorm(57, mean =6)))), type=c(rep(2, 113), rep(1,113))), aes(x=expr, color=as.factor(type), fill=as.factor(type), group=as.factor(type))) + theme_classic() + theme(axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank(),legend.position = "none", plot.title = element_text(size = 12), axis.text=element_text(size=8), axis.title=element_text(size=8), axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank())+ ggtitle("Theoretical") + xlim(-0.2,10) + 
-    #stat_function(fun = dnorm, colour = "#F8766D", args = list(mean = 3.1, sd=0.7), size=5) + 
+  ggplot(data.frame(cbind(expr = c(rnorm(113, 3), c(rnorm(56,3), rnorm(57, mean =6)))), type=c(rep(2, 113), rep(1,113))), aes(x=expr, color=as.factor(type), fill=as.factor(type), group=as.factor(type))) + theme_classic() + theme(axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank(),legend.position = "none", plot.title = element_text(size = 12), axis.text=element_text(size=8), axis.title=element_text(size=8), axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank())+ ggtitle("Theoretical") + xlim(-0.2,10) +
+    #stat_function(fun = dnorm, colour = "#F8766D", args = list(mean = 3.1, sd=0.7), size=5) +
     #stat_function(fun = dnorm, colour = "#F8766D", args = list(mean=2.9, sd=0.7), size = 5) +
-    stat_function(fun = dnorm, colour = "#00BFC4", args = list(mean = oe_means[1], sd=1), size = 5) + 
+    stat_function(fun = dnorm, colour = "#00BFC4", args = list(mean = oe_means[1], sd=1), size = 5) +
     stat_function(fun = dnorm, colour = "#00BFC4", args = list(mean = oe_means[2], sd=1), size = 5)
 }
 
@@ -55,7 +55,7 @@ oncoMixBimodal <- function(oe_means=c(3,7)){
 #' oncoMixBimodal(means = c(3,10))
 
 oncoMixTraditionalDE <- function(means=c(3,7)){
-  ggplot(data.frame(cbind(expr = c(rnorm(113, 3), c(rnorm(56,3), rnorm(57, mean =6)))), type=c(rep(2, 113), rep(1,113))), aes(x=expr, color=as.factor(type), fill=as.factor(type), group=as.factor(type))) + theme_classic() + theme(axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank(),legend.position = "none", plot.title = element_text(size = 12), axis.text=element_text(size=8), axis.title=element_text(size=8), axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank())+ ggtitle("Theoretical") + xlim(-0.2,10) + 
+  ggplot(data.frame(cbind(expr = c(rnorm(113, 3), c(rnorm(56,3), rnorm(57, mean =6)))), type=c(rep(2, 113), rep(1,113))), aes(x=expr, color=as.factor(type), fill=as.factor(type), group=as.factor(type))) + theme_classic() + theme(axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank(),legend.position = "none", plot.title = element_text(size = 12), axis.text=element_text(size=8), axis.title=element_text(size=8), axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank())+ ggtitle("Theoretical") + xlim(-0.2,10) +
     stat_function(fun = dnorm, colour = "#F8766D", args = list(mean=means[1], sd=1), size = 5) +
-    stat_function(fun = dnorm, colour = "#00BFC4", args = list(mean = means[2], sd=1), size = 5) #+ 
+    stat_function(fun = dnorm, colour = "#00BFC4", args = list(mean = means[2], sd=1), size = 5) #+
 }
