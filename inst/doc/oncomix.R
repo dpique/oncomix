@@ -22,17 +22,6 @@ dfTumorIsof[1:5, 1:5] #take a look at the matrix of mRNA expression data from tu
 mmParams = oncomix::mixModelParams(dfNmlIsof, dfTumorIsof) #fits the mixture models, will take a few mins
 head(mmParams)
 
-## ---- fig.width = 7, fig.height= 6.5-------------------------------------
-scatterMixPlot(mmParams)
-
-## ---- fig.width = 7, fig.height= 6.5-------------------------------------
-scatterMixPlot(mmParams, selIndThresh = .99)
-
-## ------------------------------------------------------------------------
-library(ggplot2)
-qplot(mmParams[,"SI"]) + theme_classic() + xlab("Selectivity Index")
-
-
 ## ------------------------------------------------------------------------
 mmParams.df = as.data.frame(mmParams)
 topGeneQuant = oncomix::topGeneQuants(mmParams.df, deltMu2Thresh = 90, deltMu1Thresh = 10, siThresh = .99)
@@ -44,6 +33,20 @@ print(topGeneTbl)
 ## ------------------------------------------------------------------------
 isof = "uc002jxc.2"
 plotGeneHist(mmParams, dfNmlIsof, dfTumorIsof, isof)
+
+
+## ---- fig.width = 7, fig.height= 6.5-------------------------------------
+scatterMixPlot(mmParams)
+
+## ---- fig.width = 7, fig.height= 6.5-------------------------------------
+scatterMixPlot(mmParams, selIndThresh = .99)
+
+## ------------------------------------------------------------------------
+scatterMixPlot(mmParams = mmParams, gene_labels = rownames(topGeneTbl))
+
+## ------------------------------------------------------------------------
+library(ggplot2)
+qplot(mmParams[,"SI"]) + theme_classic() + xlab("Selectivity Index")
 
 
 ## ------------------------------------------------------------------------

@@ -4,7 +4,7 @@
 \alias{scatterMixPlot}
 \title{Generate a scatter plot with the output from mixModelParams}
 \usage{
-scatterMixPlot(mmParams, selIndThresh = 1)
+scatterMixPlot(mmParams, selIndThresh = 1, gene_labels = NULL)
 }
 \arguments{
 \item{mmParams}{The output from the mixModelParams function. Will utilize the deltaMu2

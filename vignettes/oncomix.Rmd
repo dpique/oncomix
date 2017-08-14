@@ -82,31 +82,7 @@ The object returned by `mixModelParams` is a matrix with rows corresponding to g
   - where $N$ is the number of adjacent normal samples, and $x_{ij}$ is the expression value of the ith gene in the jth adjacent normal sample. $\mu_{iHT}$ is the mean of higher/larger Gaussian from the ith gene in tumor samples, and $\mu_{iLT}$ is the mean of the smaller/lower Gaussian from the ith gene in the tumor samples.
   
 
-## Visualize the output
-
-- We will create a scatterplot with the axes corresponding to the differences between component means. Our oncogene candidates will be those genes that appear in the upper right quadrant of this scatterplot. The x axis corresponds to the difference between the means of the curves with the larger Gaussians (`deltaMu2`), and the y axis corresponds to the difference between the means of the curves with the smaller Gaussians (`deltaMu1`) between the two treatments.
-
-- Here, $\alpha$ is a term that is present in the denominator of the y-axis and functions as an automatic scaling parameter to set the range of the y- axis to be equal to the range of the x-axis.
-
-```{r, fig.width = 7, fig.height= 6.5}
-scatterMixPlot(mmParams)
-```
-
-We can see, however, that not all genes in the upper right quadrant appear like the theoreticaly ideal oncogene. We developed an index, termed the selectivity index, that helps highlight genes that follow this ideal profile. The SI ranges from 0 to 1, and genes with a larger selectivity index will follow more closely the ideal oncogene. Now, we will highlight the isoforms with a selectivity index greater than .99 to narrow our search.
-
-```{r, fig.width = 7, fig.height= 6.5}
-scatterMixPlot(mmParams, selIndThresh = .99)
-```
-
-We can also check the distribution of the selectivity index statistic across all gene isoforms to see whether the distribution is uniform or not.
-
-```{r}
-library(ggplot2)
-qplot(mmParams[,"SI"]) + theme_classic() + xlab("Selectivity Index")
-
-```
-
-Lets say that we wanted to select a subset of gene isoforms that most resembled the theoretically ideal oncogene. We can capture all of the genes with prespecified thresholds using the `topGeneQuant` function. We can also select the top $N$ genes that most closely resemble the oncogene candidate using a custom score (`topGeneTable`). 
+- Lets say that we wanted to select a subset of gene isoforms that most resembled the theoretically ideal oncogene. We can capture all of the genes with prespecified thresholds using the `topGeneQuant` function. We can also select the top $N$ genes that most closely resemble the oncogene candidate using a custom score (`topGeneTable`). 
 
 ```{r}
 mmParams.df = as.data.frame(mmParams)
@@ -125,6 +101,40 @@ isof = "uc002jxc.2"
 plotGeneHist(mmParams, dfNmlIsof, dfTumorIsof, isof)
 
 ```
+
+
+## Visualize the output
+
+- We will create a scatterplot with the axes corresponding to the differences between component means. Our oncogene candidates will be those genes that appear in the upper right quadrant of this scatterplot. The x axis corresponds to the difference between the means of the curves with the larger Gaussians (`deltaMu2`), and the y axis corresponds to the difference between the means of the curves with the smaller Gaussians (`deltaMu1`) between the two treatments.
+
+- Here, $\alpha$ is a term that is present in the denominator of the y-axis and functions as an automatic scaling parameter to set the range of the y- axis to be equal to the range of the x-axis.
+
+```{r, fig.width = 7, fig.height= 6.5}
+scatterMixPlot(mmParams)
+```
+
+We can see, however, that not all genes in the upper right quadrant appear like the theoreticaly ideal oncogene. We developed an index, termed the selectivity index, that helps highlight genes that follow this ideal profile. The SI ranges from 0 to 1, and genes with a larger selectivity index will follow more closely the ideal oncogene. Now, we will highlight the isoforms with a selectivity index greater than .99 to narrow our search.
+
+```{r, fig.width = 7, fig.height= 6.5}
+scatterMixPlot(mmParams, selIndThresh = .99)
+```
+
+
+We can also highlight the isoforms that meet our criteria (from the previous section). Let's say that we wanted to see where the top 10 isoforms from `topGeneTbl` fall in the scatterplot.
+
+```{r}
+scatterMixPlot(mmParams = mmParams, gene_labels = rownames(topGeneTbl))
+```
+
+
+We can also check the distribution of the selectivity index statistic across all gene isoforms to see whether the distribution is uniform or not.
+
+```{r}
+library(ggplot2)
+qplot(mmParams[,"SI"]) + theme_classic() + xlab("Selectivity Index")
+
+```
+
 
 
 ```{r}

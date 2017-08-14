@@ -174,14 +174,14 @@ plotGeneHist <- function(mmParams, dfNml, dfTumor, isof){
 #' and deltaMu1 rows
 #' @keywords oncoMix, visualization, two-component
 #' @return Returns a ggplot object that you can plot
-#' @import ggplot2
+#' @import ggplot2 ggrepel
 #' @importFrom RColorBrewer brewer.pal
 #' @export
 #' @examples
 #' scatterMixPlot(mmParams)
 #' @seealso \code{\link{mixModelParams}}
 
-scatterMixPlot <- function(mmParams, selIndThresh = 1){
+scatterMixPlot <- function(mmParams, selIndThresh = 1, gene_labels = NULL){
   mmParams = as.data.frame(mmParams)
   one_over_alpha = diff(range(mmParams$deltaMu2))
   alpha1 = 1/one_over_alpha
@@ -209,7 +209,19 @@ scatterMixPlot <- function(mmParams, selIndThresh = 1){
                        col=colors_red[length(colors_red)],
                        fill=colors_red[length(colors_red)]) +
       ggtitle(bquote(Distribution~of~Mixture~Model~Parameters*","~alpha~"="~.(round(alpha1,2))*", SI >"~.(selIndThresh)))
-  } else {
+  } else if(!is.null(gene_labels)){
+    mmParams.si = mmParams[gene_labels,]
+    mmParams.si$gene_labels = gene_labels
+    x = x + geom_point(data = as.data.frame(mmParams.si),
+                       aes(x = deltaMu2, y = 1/(abs(deltaMu1)+alpha1)),
+                       size = 10, alpha=0.1,
+                       col=colors_red[length(colors_red)],
+                       fill=colors_red[length(colors_red)]) +
+      geom_text_repel(data = mmParams.si, aes(x = deltaMu2, y = 1/(abs(deltaMu1)+alpha1)),
+                label = rownames(mmParams.si)) +
+      ggtitle(bquote(Distribution~of~Mixture~Model~Parameters*","~alpha~"="~.(round(alpha1,2))))
+
+  } else{
     x = x + ggtitle(bquote(Distribution~of~Mixture~Model~Parameters*","~alpha~"="~.(round(alpha1,2))))
   }
   return(x)
