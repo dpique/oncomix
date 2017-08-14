@@ -7,7 +7,7 @@
 plotSelectivityIndex(mmParams, dfNml)
 }
 \arguments{
-\item{mmParams}{The output from the getMixModelParams function. Will utilize the deltaMu2
+\item{mmParams}{The output from the mixModelParams function. Will utilize the deltaMu2
 and deltaMu1 rows}
 
 \item{dfNml}{The normal dataframe. Will be used to calculate the SI.}

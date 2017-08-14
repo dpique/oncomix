@@ -4,10 +4,10 @@
 \alias{scatterMixPlot}
 \title{Generate a scatter plot with the output from mixModelParams}
 \usage{
-scatterMixPlot(mixModelParams, selIndThresh = 1)
+scatterMixPlot(mmParams, selIndThresh = 1)
 }
 \arguments{
-\item{mixModelParams}{The output from the getMixModelParams function. Will utilize the deltaMu2
+\item{mmParams}{The output from the mixModelParams function. Will utilize the deltaMu2
 and deltaMu1 rows}
 }
 \value{
@@ -18,7 +18,7 @@ This function allows you to generate the parameters for two 2-component mixture 
 with equal variances
 }
 \examples{
-scatterMixPlot(mixModelParams)
+scatterMixPlot(mmParams)
 }
 \seealso{
 \code{\link{mixModelParams}}

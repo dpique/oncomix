@@ -24,13 +24,13 @@
 
 mixModelParams = function(dfNml, dfTumor) {
   params_normal <- apply(dfNml, 2, function(x) {
-    y <- mclust::Mclust(data = x, G=2, modelNames = "E")
+    y <- mclust::Mclust(data = x, G=2, modelNames = "E", verbose = F)
     z <- c(n.mu = y$parameters$mean, n.var = y$parameters$variance$sigmasq, n.pi.1 = y$parameters$pro[1])
     #n.class = y$classification
     return(z) })
 
   params_tumor <- apply(dfTumor, 2, function(x) {
-    y <- mclust::Mclust(data = x, G=2, modelNames = "E")
+    y <- mclust::Mclust(data = x, G=2, modelNames = "E", verbose = F)
     z <- c(t.mu = y$parameters$mean, t.var = y$parameters$variance$sigmasq, t.pi.1 = y$parameters$pro[1])
     #t.class = y$classification
     return(z) })
@@ -87,7 +87,7 @@ selectivityIndex <- function(mmParams, dfNml){
 #' This function allows you to generate the parameters for two 2-component mixture models
 #' with equal variances
 #'
-#' @param mmParams The output from the getMixModelParams function. Will utilize the deltaMu2
+#' @param mmParams The output from the mixModelParams function. Will utilize the deltaMu2
 #' and deltaMu1 rows
 #' @param dfNml The normal dataframe. Will be used to calculate the SI.
 #' @keywords oncoMix, visualization, two-component
@@ -170,7 +170,7 @@ plotGeneHist <- function(mmParams, dfNml, dfTumor, isof){
 #' This function allows you to generate the parameters for two 2-component mixture models
 #' with equal variances
 #'
-#' @param mixModelParams The output from the getMixModelParams function. Will utilize the deltaMu2
+#' @param mmParams The output from the mixModelParams function. Will utilize the deltaMu2
 #' and deltaMu1 rows
 #' @keywords oncoMix, visualization, two-component
 #' @return Returns a ggplot object that you can plot
@@ -178,21 +178,21 @@ plotGeneHist <- function(mmParams, dfNml, dfTumor, isof){
 #' @importFrom RColorBrewer brewer.pal
 #' @export
 #' @examples
-#' scatterMixPlot(mixModelParams)
+#' scatterMixPlot(mmParams)
 #' @seealso \code{\link{mixModelParams}}
 
-scatterMixPlot <- function(mixModelParams, selIndThresh = 1){
-  mixModelParams = as.data.frame(mixModelParams)
-  one_over_alpha = diff(range(mixModelParams$deltaMu2))
+scatterMixPlot <- function(mmParams, selIndThresh = 1){
+  mmParams = as.data.frame(mmParams)
+  one_over_alpha = diff(range(mmParams$deltaMu2))
   alpha1 = 1/one_over_alpha
 
   quants = c(0.01, 0.10, 0.50, 0.90, 0.99) #add in the quantiles
   colors_red=RColorBrewer::brewer.pal(n=length(quants), name="Reds")
 
-  deltaMu2Quant <- quantile(mixModelParams[,"deltaMu2"], quants)
-  deltaMu1Quant <- quantile(1/(abs(mixModelParams[,"deltaMu1"]) + alpha1), quants)
+  deltaMu2Quant <- quantile(mmParams[,"deltaMu2"], quants)
+  deltaMu1Quant <- quantile(1/(abs(mmParams[,"deltaMu1"]) + alpha1), quants)
 
-  x = ggplot(data = as.data.frame(mixModelParams), aes(x = deltaMu2, y = 1/(abs(deltaMu1) + alpha1))) +
+  x = ggplot(data = as.data.frame(mmParams), aes(x = deltaMu2, y = 1/(abs(deltaMu1) + alpha1))) +
     theme_classic() +
     geom_hline(yintercept = deltaMu1Quant, col = colors_red, size = c(1,1,1,1,1)) +
     geom_vline(xintercept = deltaMu2Quant, col = colors_red, size = c(1,1,1,1,1)) +
@@ -202,8 +202,8 @@ scatterMixPlot <- function(mixModelParams, selIndThresh = 1){
   #print(x)
 
   if(selIndThresh < 1){
-    mixModelParams.si = mixModelParams[mixModelParams$SI > selIndThresh,]
-    x = x + geom_point(data = as.data.frame(mixModelParams.si),
+    mmParams.si = mmParams[mmParams$SI > selIndThresh,]
+    x = x + geom_point(data = as.data.frame(mmParams.si),
                        aes(x = deltaMu2, y = 1/(abs(deltaMu1)+alpha1)),
                        size = 10, alpha=0.1,
                        col=colors_red[length(colors_red)],
@@ -215,5 +215,63 @@ scatterMixPlot <- function(mixModelParams, selIndThresh = 1){
   return(x)
 }
 
+#' Identify genes that meet pre-specified quantiles
+#'
+#' This function allows you to subset genes that are above pre-specified quantiles
+#' and that most closely resemble the distribution of oncogenes.
+#'
+#' @param mmParams The output from the mixModelParams function.
+#' @param deltMu2Thresh The percentile threshold for the deltaMu2 statistic.
+#' All genes exceeding this percentile threshold will be selected.
+#' @param deltMu1Thresh The percentile threshold for the deltaMu1 statistic.
+#' All genes exceeding this percentile threshold will be selected.
+#' @param siThresh The threshold for the selectivity index statistic (between 0 - 1).
+#' All genes exceeding this threshold will be selected.
+#' @keywords subsetting
+#' @return Returns a dataframe containing all genes meeting the prespecified thresholds.
+#' @export
+#' @examples
+#' topGeneQuants(mmParams)
+#' @seealso \code{\link{mixModelParams}}
+
+topGeneQuants = function(mmParams, deltMu2Thresh = 90, deltMu1Thresh = 10, siThresh = .99){
+  mmParams.df = as.data.frame(mmParams)
+  quantile(abs(mmParams.df$deltaMu1), .1)
+  deltaMu2Quant = quantile(mmParams.df$deltaMu2, deltMu2Thresh*.01)
+  deltaMu1Quant = quantile(abs(mmParams.df$deltaMu1), deltMu1Thresh*.01)
+  siQuant = quantile(mmParams.df$SI, siThresh)
+
+  mmParams.df = as.data.frame(mmParams)
+
+  tfVect = mmParams.df$deltaMu2 > deltaMu2Quant & abs(mmParams.df$deltaMu1) < deltaMu1Quant & mmParams.df$SI > siThresh
+  mmParams.df.quantSubset = mmParams.df[tfVect,]
+  return(mmParams.df.quantSubset)
+}
 
 
+
+#' Identify the top N genes based on a score
+#'
+#' This function allows you to identify the top N genes that most
+#' closely match the distributional profiles of a theoretical oncogene.
+#'
+#' @param mmParams The output from the mixModelParams function.
+#' @param N An integer specified by the user to indicate how many genes they would like to return.
+#' @keywords subsetting
+#' @return Returns a dataframe containing the top N genes (where N is specified by the user)
+#' computed using a custom score that incorporates differences between component means and the variance.
+#' @export
+#' @examples
+#' topGeneQuants(mmParams, N = 10)
+#' @seealso \code{\link{mixModelParams}}
+
+
+#returns a list of genes
+topGeneTable = function(mmParams, N=nrow(mmParams)){
+  #returns the top N genes based on a score
+  mmParams.df = as.data.frame(mmParams)
+  mmParams.df$score = mmParams.df$SI*{(mmParams.df$deltaMu2 -  mmParams.df$deltaMu1) - (mmParams.df$n.var + mmParams.df$t.var)}
+  mmParams.df.s = mmParams.df[with(mmParams.df, order(-score)), ]
+  mmParams.df.s.subset = mmParams.df.s[1:N,]
+  return(mmParams.df.s.subset)
+}
