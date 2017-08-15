@@ -248,13 +248,10 @@ scatterMixPlot <- function(mmParams, selIndThresh = 1, gene_labels = NULL){
 
 topGeneQuants = function(mmParams, deltMu2Thresh = 90, deltMu1Thresh = 10, siThresh = .99){
   mmParams.df = as.data.frame(mmParams)
-  quantile(abs(mmParams.df$deltaMu1), .1)
   deltaMu2Quant = quantile(mmParams.df$deltaMu2, deltMu2Thresh*.01)
-  deltaMu1Quant = quantile(abs(mmParams.df$deltaMu1), deltMu1Thresh*.01)
-  siQuant = quantile(mmParams.df$SI, siThresh)
+  deltaMu1Quant = quantile(abs(mmParams.df$deltaMu1), {100-deltMu1Thresh}*.01)
 
   mmParams.df = as.data.frame(mmParams)
-
   tfVect = mmParams.df$deltaMu2 > deltaMu2Quant & abs(mmParams.df$deltaMu1) < deltaMu1Quant & mmParams.df$SI > siThresh
   mmParams.df.quantSubset = mmParams.df[tfVect,]
   return(mmParams.df.quantSubset)

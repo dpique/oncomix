@@ -24,7 +24,7 @@ head(mmParams)
 
 ## ------------------------------------------------------------------------
 mmParams.df = as.data.frame(mmParams)
-topGeneQuant = oncomix::topGeneQuants(mmParams.df, deltMu2Thresh = 90, deltMu1Thresh = 10, siThresh = .99)
+topGeneQuant = oncomix::topGeneQuants(mmParams.df, deltMu2Thresh = 99, deltMu1Thresh = 10, siThresh = .99) #need to fix this function
 print(topGeneQuant)
 topGeneTbl = oncomix::topGeneTable(mmParams.df, N = 10) #want the top 10 isoforms based on a custom score
 print(topGeneTbl)

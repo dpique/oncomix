@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "To do:\n\n- Add a feature to highlight/label certain genes\n- Change order of vignette\n- Create shiny app to visualize datapoint (highlight genes)\n  - Also, put in a list of genes and visualize these\n  - Link to existing oncogene databases\n  - Automatically plot distribution of genes when you click on a dot.\n  - Give metadata about gene (where it is, how is it related to other genes)\n",
+    "created" : 1502732652535.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1172494456",
+    "id" : "1279118C",
+    "lastKnownWriteTime" : 1502732876,
+    "last_content_update" : 1502732876739,
+    "path" : "//data.einstein.yu.edu/home/dpique/dpLabNotebook/bimodality_brca_tcga/oncomix/to-do",
+    "project_path" : "to-do",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "text"
+}

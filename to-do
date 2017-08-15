@@ -1,0 +1,9 @@
+To do:
+
+- Add a feature to highlight/label certain genes
+- Change order of vignette
+- Create shiny app to visualize datapoint (highlight genes)
+  - Also, put in a list of genes and visualize these
+  - Link to existing oncogene databases
+  - Automatically plot distribution of genes when you click on a dot.
+  - Give metadata about gene (where it is, how is it related to other genes)

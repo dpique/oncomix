@@ -24,7 +24,7 @@ OncoMix is an R package for identifying oncogene candidates based off of 2-compo
 
 
 
-The advent of large, well-curated databases, such as the [genomic data commons](https://gdc.cancer.gov/), that contain RNA sequencing data from hundreds of patient tumors has made it possible to identify oncogene candidates based off of mRNA expression alone. The method proposed here is the first developed to identify oncogenes from RNA-sequencing data in large cohorts of patients.
+The advent of large, well-curated databases, such as the [genomic data commons](https://gdc.cancer.gov/), that contain RNA sequencing data from hundreds of patient tumors has made it possible to identify oncogene candidates based off of mRNA expression alone. Oncomix is the first method developed to identify oncogenes in a visually-interpretable manner from RNA-sequencing data in large cohorts of patients.
 
 ```{r}
 #devtools::install_github("dpique/oncomix")
@@ -82,17 +82,20 @@ The object returned by `mixModelParams` is a matrix with rows corresponding to g
   - where $N$ is the number of adjacent normal samples, and $x_{ij}$ is the expression value of the ith gene in the jth adjacent normal sample. $\mu_{iHT}$ is the mean of higher/larger Gaussian from the ith gene in tumor samples, and $\mu_{iLT}$ is the mean of the smaller/lower Gaussian from the ith gene in the tumor samples.
   
 
-- Lets say that we wanted to select a subset of gene isoforms that most resembled the theoretically ideal oncogene. We can capture all of the genes with prespecified thresholds using the `topGeneQuant` function. We can also select the top $N$ genes that most closely resemble the oncogene candidate using a custom score (`topGeneTable`). 
+We can now use this table to generate a variety of visualizations and inferences into what an ideal oncogene candidate might look like.
+
+For example, lets say that we wanted to select a subset of gene isoforms that most resembled the theoretically ideal oncogene. We can capture all of the genes with prespecified thresholds using the `topGeneQuant` function. We can also select the top $N$ genes that most closely resemble the oncogene candidate using a custom score (`topGeneTable`). 
 
 ```{r}
 mmParams.df = as.data.frame(mmParams)
-topGeneQuant = oncomix::topGeneQuants(mmParams.df, deltMu2Thresh = 90, deltMu1Thresh = 10, siThresh = .99)
+topGeneQuant = oncomix::topGeneQuants(mmParams.df, deltMu2Thresh = 99, deltMu1Thresh = 10, siThresh = .99) #need to fix this function
 print(topGeneQuant)
 topGeneTbl = oncomix::topGeneTable(mmParams.df, N = 10) #want the top 10 isoforms based on a custom score
 print(topGeneTbl)
 
 ```
 
+## Visualize the output
 
 - Now, we will visualize the distribution of gene expression values for a particular isoform. Specifically, we will create a overlapping histogram of an single isoforms's expression values across both tumor (teal) and adjacent normal (red) samples with the best-fitting Gaussian curves superimposed.
 
@@ -102,8 +105,6 @@ plotGeneHist(mmParams, dfNmlIsof, dfTumorIsof, isof)
 
 ```
 
-
-## Visualize the output
 
 - We will create a scatterplot with the axes corresponding to the differences between component means. Our oncogene candidates will be those genes that appear in the upper right quadrant of this scatterplot. The x axis corresponds to the difference between the means of the curves with the larger Gaussians (`deltaMu2`), and the y axis corresponds to the difference between the means of the curves with the smaller Gaussians (`deltaMu1`) between the two treatments.
 
