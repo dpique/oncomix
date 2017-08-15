@@ -19,4 +19,9 @@ RoxygenNote: 6.0.1
 Suggests:
     knitr,
     rmarkdown
+Imports:
+    ggplot2,
+    ggrepel,
+    RColorBrewer,
+    mclust
 VignetteBuilder: knitr
