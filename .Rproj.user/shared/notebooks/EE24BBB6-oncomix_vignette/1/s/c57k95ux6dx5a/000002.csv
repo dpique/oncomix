@@ -1,5 +1,0 @@
-"0","topGeneQuants(mmParams.df)
-"
-"2","Error in quantile(abs(mmParams.df$deltaMu1), 0.1) : 
-  object 'mmParams.df' not found
-"
