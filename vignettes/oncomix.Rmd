@@ -188,17 +188,12 @@ Lastly, we will check the distribution of the OncoMix `score` across all gene is
 library(ggplot2)
 library(RColorBrewer)
 col = brewer.pal(3, "Dark2")
-#orange = isoforms that map to genes in the ONGene database
-#purple = isoforms that don't map to genes in the ONGene database
-
-
 ggplot(mmParams.m, aes(x = score, y = ..density.., fill=is.na(geneSymbol))) +
   geom_histogram(data=subset(mmParams.m, is.na(geneSymbol)), fill = col[2], alpha = 0.5)+ 
   geom_histogram(data=subset(mmParams.m, !is.na(geneSymbol)), fill = col[3], alpha = 0.5)+ theme_classic() + xlab("OncoMix Score")+ theme_classic() 
-
 ```
 
-The distribution of the OncoMix scores is more or less the same between isoforms in the ONGene database versus those not in the ONGene database. The reason that there is no clear overall enrichment in oncogenes within higher scores is addressed in the section above. The few isoforms that are not in the oncogene database and that have high scores may represent oncogenes that are yet to be discovered.
+The distribution of the OncoMix scores looks equivalent between isoforms in the ONGene database versus those not in the ONGene database. However, the short right tail of this distribution, which contains isoforms with high scores, also preferentially consists of isoforms that map to genes in the ONGene database. In addition, the few isoforms that are not in the ONGene database and that have high scores may represent oncogenes that are yet to be discovered.
 
 ## Session Info
 

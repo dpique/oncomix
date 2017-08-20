@@ -80,14 +80,9 @@ scatterMixPlot(mmParams = mmParams, gene_labels = rownames(mmParams.m.s))
 library(ggplot2)
 library(RColorBrewer)
 col = brewer.pal(3, "Dark2")
-#orange = isoforms that map to genes in the ONGene database
-#purple = isoforms that don't map to genes in the ONGene database
-
-
 ggplot(mmParams.m, aes(x = score, y = ..density.., fill=is.na(geneSymbol))) +
   geom_histogram(data=subset(mmParams.m, is.na(geneSymbol)), fill = col[2], alpha = 0.5)+ 
   geom_histogram(data=subset(mmParams.m, !is.na(geneSymbol)), fill = col[3], alpha = 0.5)+ theme_classic() + xlab("OncoMix Score")+ theme_classic() 
-
 
 ## ------------------------------------------------------------------------
 sessionInfo()
