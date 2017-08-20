@@ -49,7 +49,10 @@ mixModelParams = function(dfNml, dfTumor) {
   SI = sapply(1:ncol(dfNml), function(i) si_calc(dfNml[,i], boundaryTumor[i]))
 
   params = rbind(params, deltaMu2, deltaMu1, SI)
-  return(t(params))
+  mmParams.df = data.frame(t(params))
+  mmParams.df$score = mmParams.df$SI*{(mmParams.df$deltaMu2 -  mmParams.df$deltaMu1) - (mmParams.df$n.var + mmParams.df$t.var)}
+  mmParams.df.s = mmParams.df[with(mmParams.df, order(-score)), ] #order by score
+  return(mmParams.df.s)
 }
 
 
@@ -218,7 +221,7 @@ scatterMixPlot <- function(mmParams, selIndThresh = 1, gene_labels = NULL){
                        col=colors_red[length(colors_red)],
                        fill=colors_red[length(colors_red)]) +
       geom_text_repel(data = mmParams.si, aes(x = deltaMu2, y = 1/(abs(deltaMu1)+alpha1)),
-                label = rownames(mmParams.si)) +
+                      label = rownames(mmParams.si)) +
       ggtitle(bquote(Distribution~of~Mixture~Model~Parameters*","~alpha~"="~.(round(alpha1,2))))
 
   } else{
@@ -257,30 +260,3 @@ topGeneQuants = function(mmParams, deltMu2Thresh = 90, deltMu1Thresh = 10, siThr
   return(mmParams.df.quantSubset)
 }
 
-
-
-#' Identify the top N genes based on a score
-#'
-#' This function allows you to identify the top N genes that most
-#' closely match the distributional profiles of a theoretical oncogene.
-#'
-#' @param mmParams The output from the mixModelParams function.
-#' @param N An integer specified by the user to indicate how many genes they would like to return.
-#' @keywords subsetting
-#' @return Returns a dataframe containing the top N genes (where N is specified by the user)
-#' computed using a custom score that incorporates differences between component means and the variance.
-#' @export
-#' @examples
-#' topGeneQuants(mmParams, N = 10)
-#' @seealso \code{\link{mixModelParams}}
-
-
-#returns a list of genes
-topGeneTable = function(mmParams, N=nrow(mmParams)){
-  #returns the top N genes based on a score
-  mmParams.df = as.data.frame(mmParams)
-  mmParams.df$score = mmParams.df$SI*{(mmParams.df$deltaMu2 -  mmParams.df$deltaMu1) - (mmParams.df$n.var + mmParams.df$t.var)}
-  mmParams.df.s = mmParams.df[with(mmParams.df, order(-score)), ]
-  mmParams.df.s.subset = mmParams.df.s[1:N,]
-  return(mmParams.df.s.subset)
-}
