@@ -83,9 +83,9 @@ The object returned by `mixModelParams` is a dataframe with rows corresponding t
   - where $N$ is the number of adjacent normal samples, and $x_{ij}$ is the expression value of the ith gene in the jth adjacent normal sample. $\mu_{iHT}$ is the mean of higher/larger Gaussian from the ith gene in tumor samples, and $\mu_{iLT}$ is the mean of the smaller/lower Gaussian from the ith gene in the tumor samples.
   
   - `score` = The score for the $i^{th}$ gene is calculated as follows:
-   $$score_i  = (\Delta\mu_{2i} - \Delta\mu_{1i}) - (var_{Ni} - var_{Ti}) ~~~~~, $$
+   $$score_i  = SI * [(\Delta\mu_{2i} - \Delta\mu_{1i}) - (var_{Ni} - var_{Ti})] ~~~~~, $$
  
-  - where $\Delta\mu_{2i}$ and $\Delta\mu_{1i}$ are as described above (equivalent to `deltaMu2` and `deltaMu1`), $var_{Ni}$ is the common variance across the adjacent normal samples (equivalent to `n.var`), and $var_{Ti}$ is the common variance across the tumor samples (equivalent to `t.var`).
+  - where $SI$ is the selectivity index described above, $\Delta\mu_{2i}$ and $\Delta\mu_{1i}$ are as described above (equivalent to `deltaMu2` and `deltaMu1`), $var_{Ni}$ is the common variance across the adjacent normal samples (equivalent to `n.var`), and $var_{Ti}$ is the common variance across the tumor samples (equivalent to `t.var`).
 
 We can now use the `mmParams` dataframe to generate a variety of visualizations and to figure out which of our isoforms in our gene set is most similar in appearance to our idealized oncogene candidate.
 
@@ -140,7 +140,7 @@ scatterMixPlot(mmParams = mmParams, gene_labels = rownames(mmParams.top10))
 
 We can check the distribution of the isoforms that map to known human oncogenes. To do this, we will use genes classified as oncogenes from the [ONGene database](http://ongene.bioinfo-minzhao.org/), which is first literature-curated database of oncogenes. This paper was published in 2017. 
 
-We will then map the oncogenes in the database (which are in gene symbols) to ucsc isoforms, which is the gene format that we have in our original datasets. We'll show where the top 5 isoforms mapping to oncogenes in the ONGene database land on this scatterplot.
+We will then map the oncogenes in the database (which are in gene symbols) to ucsc isoforms, which is the gene format that we have in our original datasets, using an R interface to the public UCSC MySQL database. We'll show where the top 5 isoforms mapping to oncogenes in the ONGene database land on this scatterplot.
 
 ```{r}
 #install.packages("RMySQL")

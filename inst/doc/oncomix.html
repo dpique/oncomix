@@ -304,8 +304,8 @@ head(mmParams)</code></pre>
  \]</span></p>
 <ul>
 <li><p>where <span class="math inline">\(N\)</span> is the number of adjacent normal samples, and <span class="math inline">\(x_{ij}\)</span> is the expression value of the ith gene in the jth adjacent normal sample. <span class="math inline">\(\mu_{iHT}\)</span> is the mean of higher/larger Gaussian from the ith gene in tumor samples, and <span class="math inline">\(\mu_{iLT}\)</span> is the mean of the smaller/lower Gaussian from the ith gene in the tumor samples.</p></li>
-<li><p><code>score</code> = The score for the <span class="math inline">\(i^{th}\)</span> gene is calculated as follows: <span class="math display">\[score_i  = (\Delta\mu_{2i} - \Delta\mu_{1i}) - (var_{Ni} - var_{Ti}) ~~~~~, \]</span></p></li>
-<li><p>where <span class="math inline">\(\Delta\mu_{2i}\)</span> and <span class="math inline">\(\Delta\mu_{1i}\)</span> are as described above (equivalent to <code>deltaMu2</code> and <code>deltaMu1</code>), <span class="math inline">\(var_{Ni}\)</span> is the common variance across the adjacent normal samples (equivalent to <code>n.var</code>), and <span class="math inline">\(var_{Ti}\)</span> is the common variance across the tumor samples (equivalent to <code>t.var</code>).</p></li>
+<li><p><code>score</code> = The score for the <span class="math inline">\(i^{th}\)</span> gene is calculated as follows: <span class="math display">\[score_i  = SI * [(\Delta\mu_{2i} - \Delta\mu_{1i}) - (var_{Ni} - var_{Ti})] ~~~~~, \]</span></p></li>
+<li><p>where <span class="math inline">\(SI\)</span> is the selectivity index described above, <span class="math inline">\(\Delta\mu_{2i}\)</span> and <span class="math inline">\(\Delta\mu_{1i}\)</span> are as described above (equivalent to <code>deltaMu2</code> and <code>deltaMu1</code>), <span class="math inline">\(var_{Ni}\)</span> is the common variance across the adjacent normal samples (equivalent to <code>n.var</code>), and <span class="math inline">\(var_{Ti}\)</span> is the common variance across the tumor samples (equivalent to <code>t.var</code>).</p></li>
 </ul>
 <p>We can now use the <code>mmParams</code> dataframe to generate a variety of visualizations and to figure out which of our isoforms in our gene set is most similar in appearance to our idealized oncogene candidate.</p>
 <p>For example, lets say that we wanted to select a subset of gene isoforms that most resembled the theoretically ideal oncogene. We can capture all of the genes meeting or exceeding specified thresholds using the <code>topGeneQuant</code> function. Here, we want to maximize <code>deltMu2</code>, minimize <code>deltMu1</code>, and maximize the <code>SI</code>.</p>
@@ -372,7 +372,7 @@ plotGeneHist(mmParams, dfNmlIsof, dfTumorIsof, isof)</code></pre>
 <div id="isoforms-that-map-to-oncogenes-in-an-online-database" class="section level3">
 <h3>Isoforms that map to oncogenes in an online database</h3>
 <p>We can check the distribution of the isoforms that map to known human oncogenes. To do this, we will use genes classified as oncogenes from the <a href="http://ongene.bioinfo-minzhao.org/">ONGene database</a>, which is first literature-curated database of oncogenes. This paper was published in 2017.</p>
-<p>We will then map the oncogenes in the database (which are in gene symbols) to ucsc isoforms, which is the gene format that we have in our original datasets. We’ll show where the top 5 isoforms mapping to oncogenes in the ONGene database land on this scatterplot.</p>
+<p>We will then map the oncogenes in the database (which are in gene symbols) to ucsc isoforms, which is the gene format that we have in our original datasets, using an R interface to the public UCSC MySQL database. We’ll show where the top 5 isoforms mapping to oncogenes in the ONGene database land on this scatterplot.</p>
 <pre class="r"><code>#install.packages(&quot;RMySQL&quot;)
 library(RMySQL)
 
