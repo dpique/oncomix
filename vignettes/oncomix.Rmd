@@ -38,11 +38,13 @@ library(ggplot2)
 oncomix::oncoMixIdeal()
 ```
 
-The teal curves represent the probability distribution (PD) over expression values from a single gene obtained from multiple tumors samples. The red-orange curves represent the PD over expression values from the same gene obtained from multiple adjacent normal tissue samples. Visually, we see that for a theoretical oncogene, there is a *subgroup* of tumors that overexpresses this gene relative to normal tissue.
+The x-axis represents mRNA expression values, with lower values toward the left and larger values (i.e. higher expression) toward the right. The y axis represents density. The teal curves represent the best-fitting Gaussian probability distribution (PD) over expression values from a single gene obtained from multiple tumor samples. The red-orange curves represent the PD over expression values from the same gene obtained from multiple adjacent normal tissue samples. This mixture model is applied once to the tumor data and again (separately) to the adjacent normal data, hence the 4 curves. 
+
+The advantage of applying a 2-component mixture model is that we are able to capture biologically-relevant clusters of gene expression that may naturally exist in the data. Otherwise, we might represent our data with just a single curve sitting in the middle of what really are 2 distinct clusters. Visually, we see that for a theoretical oncogene, there is a *subgroup* of tumors that overexpresses this gene relative to normal tissue.
 
 ## Identify Oncogene Candidates 
 
-Now, we will load at an example dataset that contains expression values for 4789 mRNA  isoforms obtained from paired samples of breast tumor (`dfTumorIsof`) and adjacent normal(`dfNmlIsof`) breast tissue from 113 patients. We will fit the mixture model using the oncomix function `mixModelParams`, which takes dataframes that contain patients as rows and mRNA isoforms/genes as columns. The number of columns (genes) should be the same between both dataframes, though the number of rows can vary. 
+Now, we will load at an example dataset that contains expression values for 4789 mRNA isoforms obtained from paired samples of breast tumor (`dfTumorIsof`) and adjacent normal(`dfNmlIsof`) breast tissue from 113 patients. We will fit the mixture model using the oncomix function `mixModelParams`, which takes dataframes that contain patients as rows and mRNA isoforms/genes as columns. The number of columns (genes) should be the same between both dataframes, though the number of rows can vary. 
 
 ```{r}
 data(dfNmlIsof, dfTumorIsof, package="oncomix")
@@ -53,11 +55,11 @@ dfNmlIsof[1:5, 1:5] #take a look at the matrix of mRNA expression data from adja
 dim(dfTumorIsof)
 dfTumorIsof[1:5, 1:5] #take a look at the matrix of mRNA expression data from tumors
 
-mmParams = oncomix::mixModelParams(dfNmlIsof, dfTumorIsof) #fits the mixture models, will take a few mins
+mmParams = oncomix::mixModelParams(dfNmlIsof, dfTumorIsof) #fits the mixture models, will take a few minutes
 head(mmParams)
 ```
 
-The object returned by `mixModelParams` is a dataframe with rows corresponding to genes and 12 columns containing mixture model parameters. The rows are sorted according to the `score` column, with the first row containing the highest score. The meaning of the dataframe columns are described below:
+The object returned by `mixModelParams` is a dataframe with rows corresponding to genes and 12 columns containing mixture model parameters. The rows are sorted according to the `score` column, with the first row containing the highest oncomix score (defined below). The meaning of the dataframe columns are described below:
 
   - `n.mu.1` = the mean ($\mu$) of the Gaussian curve with the smaller mean fit to the adjacent normal expression data 
   - `n.mu.2` = the mean ($\mu$) of the Gaussian curve with the larger mean fit to the adjacent normal expression data 
@@ -85,9 +87,9 @@ The object returned by `mixModelParams` is a dataframe with rows corresponding t
  
   - where $\Delta\mu_{2i}$ and $\Delta\mu_{1i}$ are as described above (equivalent to `deltaMu2` and `deltaMu1`), $var_{Ni}$ is the common variance across the adjacent normal samples (equivalent to `n.var`), and $var_{Ti}$ is the common variance across the tumor samples (equivalent to `t.var`).
 
-We can now use this table to generate a variety of visualizations and to figure out which of our isoforms in our gene set is most similar in appearance to our idealized oncogene candidate.
+We can now use the `mmParams` dataframe to generate a variety of visualizations and to figure out which of our isoforms in our gene set is most similar in appearance to our idealized oncogene candidate.
 
-For example, lets say that we wanted to select a subset of gene isoforms that most resembled the theoretically ideal oncogene. We can capture all of the genes meeting or exceeding specified thresholds using the `topGeneQuant` function. 
+For example, lets say that we wanted to select a subset of gene isoforms that most resembled the theoretically ideal oncogene. We can capture all of the genes meeting or exceeding specified thresholds using the `topGeneQuant` function. Here, we want to maximize `deltMu2`, minimize `deltMu1`, and maximize the `SI`.
 
 ```{r}
 topGeneQuant = oncomix::topGeneQuants(mmParams, deltMu2Thresh = 99, deltMu1Thresh = 10, siThresh = .99)
@@ -107,7 +109,7 @@ print(mmParams.top10)
 
 ### Visualize isoforms with a high SI & oncomix score
 
-Now, we will visualize the distribution of gene expression values for a particular isoform. Specifically, we will create a overlapping histogram of an single isoforms's expression values across both tumor (teal) and adjacent normal (red) samples with the best-fitting Gaussian curves superimposed. The isoform that we want to visualize here, uc002jxc.2, is among the 5 isoforms in the output from `topGeneQuant` function. It also ranks 7th out of 4789 isoforms in terms of its oncomix score, so it should have a distributional profile that is more similar to our theoretical oncogene that most other isoforms in this dataset.
+Now, we will visualize the distribution of gene expression values for a particular isoform. Specifically, we will create a overlapping histogram of an single isoform's expression values across both tumor (teal) and adjacent normal (red) samples with the best-fitting Gaussian curves superimposed. The isoform that we want to visualize here, uc002jxc.2, is among the 5 isoforms in the output from `topGeneQuant` function. It also ranks 7th out of 4789 isoforms in terms of its oncomix score, so it should have a distributional profile that is more similar to our theoretical oncogene that most other isoforms in this dataset.
 
 ```{r}
 isof = "uc002jxc.2"
@@ -116,18 +118,17 @@ plotGeneHist(mmParams, dfNmlIsof, dfTumorIsof, isof)
 
 Next, we will create a scatterplot with the axes corresponding to the differences between component means. Our oncogene candidates will be those genes that appear in the upper right quadrant of this scatterplot. The x axis corresponds to the difference between the means of the curves with the larger Gaussians (`deltaMu2`), and the y axis corresponds to the difference between the means of the curves with the smaller Gaussians (`deltaMu1`) between the two treatments.
 
-- Here, $\alpha$ is a term that is present in the denominator of the y-axis and functions as an automatic scaling parameter to set the range of the y- axis to be equal to the range of the x-axis.
+Here, $\alpha$ (in the title) is a term that is present in the denominator of the value of the y-axis and functions as an automatic scaling parameter to set the range of the y-axis to be approximately equal to the range of the x-axis.
 
 ```{r, fig.width = 7, fig.height= 6.5}
 scatterMixPlot(mmParams)
 ```
 
-However, due to the large variance displayed by some of these genes, not all genes in the upper right quadrant appear like the theoreticaly ideal oncogene. We developed an index, termed the selectivity index (SI), that helps highlight genes that follow our ideal profile. The SI ranges from 0 to 1, and genes with a larger selectivity index will follow more closely the ideal oncogene. Now, we will highlight the isoforms with a selectivity index greater than .99 using the `selIndThresh` argument to narrow our search.
+We would expect isoforms that maximize deltaMu1 and minimize deltaMu2 to be most visually similar to the theoretical oncogene candidate, and thus to be present within the uppre right quadrant of this histogram. However, due to the large variance displayed by some of these isoforms, not all isoforms in the upper right quadrant appear like the theoreticaly ideal oncogene. We developed an index, termed the selectivity index (SI), that helps highlight genes that follow our ideal profile. The SI ranges from 0 to 1, and genes with a larger selectivity index will follow more closely the ideal oncogene. Now, we will highlight the isoforms with a selectivity index greater than .99 using the `selIndThresh` argument to narrow our search.
 
 ```{r, fig.width = 7, fig.height= 6.5}
 scatterMixPlot(mmParams, selIndThresh = .99)
 ```
-
 
 We can also highlight where the top 10 isoforms with the highest score fall in the scatterplot.
 

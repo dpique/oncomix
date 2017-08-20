@@ -18,7 +18,7 @@ dfNmlIsof[1:5, 1:5] #take a look at the matrix of mRNA expression data from adja
 dim(dfTumorIsof)
 dfTumorIsof[1:5, 1:5] #take a look at the matrix of mRNA expression data from tumors
 
-mmParams = oncomix::mixModelParams(dfNmlIsof, dfTumorIsof) #fits the mixture models, will take a few mins
+mmParams = oncomix::mixModelParams(dfNmlIsof, dfTumorIsof) #fits the mixture models, will take a few minutes
 head(mmParams)
 
 ## ------------------------------------------------------------------------
