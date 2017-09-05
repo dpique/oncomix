@@ -18,9 +18,11 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
 ```
  
-## Introduction
+## 1. Introduction
 
-Background: The advent of large, well-curated databases, such as the [genomic data commons](https://gdc.cancer.gov/), that contain RNA sequencing data from hundreds of patient tumors has made it possible to identify oncogene candidates based off of mRNA expression alone. Oncomix is the first method developed to identify oncogenes in a visually-interpretable manner from RNA-sequencing data in large cohorts of patients. 
+### 1.1 Motivation for developing OncoMix
+
+The advent of large, well-curated databases, such as the [genomic data commons](https://gdc.cancer.gov/), that contain RNA sequencing data from hundreds of patient tumors has made it possible to identify oncogene candidates based off of mRNA expression alone. OncoMix is the first method developed to identify oncogenes in a visually-interpretable manner from RNA-sequencing data in large cohorts of patients. 
 
 OncoMix is an R package for identifying oncogene candidates based off of 2-component Gaussian mixture models. It estimates parameters using the expectation maximization procedure as implemented in the R package mclust. This tutorial will demonstrate how to identify oncogene candidates from a set of mRNA sequencing data. We start by loading the package:
 
@@ -31,7 +33,7 @@ library(oncomix)
 
 We then pose the following question, the answer to which forms the basis for this method:
 
-### What should the distribution of oncogene mRNA expression in a population of tumors and adjacent normal tissue ideally look like?
+### 1.2 What should the distribution of oncogene mRNA expression in a population of tumors and adjacent normal tissue ideally look like?
 
 ```{r}
 library(ggplot2)
@@ -42,9 +44,17 @@ The x-axis represents mRNA expression values, with lower values toward the left 
 
 The advantage of applying a 2-component mixture model is that we are able to capture biologically-relevant clusters of gene expression that may naturally exist in the data. Otherwise, we might represent our data with just a single curve sitting in the middle of what really are 2 distinct clusters. Visually, we see that for a theoretical oncogene, there is a *subgroup* of tumors that overexpresses this gene relative to normal tissue.
 
-## Identify Oncogene Candidates 
+We compare our approach to the techniques employed by traditional differential expression analysis (e.g. Student's t-test, as employed by limma, or DESeq2). These approaches make strong assumptions -- namely, that the data from a particular group are well-described by distributions with mass concentrated around a single point (a 'mean', if you will). If we were to use one of these approaches on a large dataset, our assumption would be that oncogenes are overexpressed in *every* tumor sample compared to normal tissue. This assumption can be visualized below:
 
-Now, we will load at an example dataset that contains expression values for 4789 mRNA isoforms obtained from paired samples of breast tumor (`dfTumorIsof`) and adjacent normal(`dfNmlIsof`) breast tissue from 113 patients. We will fit the mixture model using the oncomix function `mixModelParams`, which takes dataframes that contain patients as rows and mRNA isoforms/genes as columns. The number of columns (genes) should be the same between both dataframes, though the number of rows can vary. 
+```{r}
+oncoMixTraditionalDE()
+```
+
+## 2. Identifying Oncogene Candidates 
+
+### 2.1 Loading example data and exploring the `mixModelParams` object
+
+Now, we will load an example dataset that contains expression values for 4789 mRNA isoforms obtained from paired samples of breast tumor (`dfTumorIsof`) and adjacent normal(`dfNmlIsof`) breast tissue from 113 patients. We will fit the mixture model using the oncomix function `mixModelParams`, which takes dataframes that contain patients as rows and mRNA isoforms/genes as columns. The number of columns (genes) should be the same between both dataframes, though the number of rows can vary. 
 
 ```{r}
 data(dfNmlIsof, dfTumorIsof, package="oncomix")
@@ -61,15 +71,15 @@ head(mmParams)
 
 The object returned by `mixModelParams` is a dataframe with rows corresponding to genes and 12 columns containing mixture model parameters. The rows are sorted according to the `score` column, with the first row containing the highest oncomix score (defined below). The meaning of the dataframe columns are described below:
 
-  - `n.mu.1` = the mean ($\mu$) of the Gaussian curve with the smaller mean fit to the adjacent normal expression data 
-  - `n.mu.2` = the mean ($\mu$) of the Gaussian curve with the larger mean fit to the adjacent normal expression data 
+  - `n.mu.1` = the mean ($\mu$) of the Gaussian curve with the smaller mean fit to the adjacent normal expression data (referred to as Mode 1).
+  - `n.mu.2` = the mean ($\mu$) of the Gaussian curve with the larger mean fit to the adjacent normal expression data (referred to as Mode 2).
   - `n.var` = the variance ($\sigma$) of the two Gaussian curves fit to the adjacent normal expression data (fixed to be equal between the two curves)
   - `n.pi.1` = the proportion of adjacent normal samples assigned to the Gaussian curve with mean `n.mu.1`
   
-  - `t.mu.1` = the mean ($\mu$) of the Gaussian curve with the smaller mean fit to the tumor expression data 
-  - `t.mu.2` = the mean ($\mu$) of the Gaussian curve with the larger mean fit to the tumor expression data. Greater than 0 for sets of expression data with all values $\geq0$.
-  - `t.var` = the variance ($\sigma$) of the two Gaussian curves fit to the tumor expression data (fixed to be equal between the two curves). Greater than 0.
-  - `t.pi.1` = the proportion of tumor samples assigned to the Gaussian curve with mean `t.mu.1`. Between 0-1
+  - `t.mu.1` = the mean ($\mu$) of the Gaussian curve with the smaller mean fit to the tumor expression data (referred to as Mode 1).
+  - `t.mu.2` = the mean ($\mu$) of the Gaussian curve with the larger mean fit to the tumor expression data. (referred to as Mode 2).
+  - `t.var` = the variance ($\sigma$) of the two Gaussian curves fit to the tumor expression data (fixed to be equal between the two curves).
+  - `t.pi.1` = the proportion of tumor samples assigned to the Gaussian curve with mean `t.mu.1`.
   
   - `deltaMu2` = the difference between the means of the two curves between groups. `t.mu.2` - `n.mu.2`. May be negative or positive.  
   - `deltaMu1` = the difference between the means of the two curves between groups. `t.mu.1` - `n.mu.1`. May be negative or positive. 
@@ -87,7 +97,9 @@ The object returned by `mixModelParams` is a dataframe with rows corresponding t
  
   - where $SI$ is the selectivity index described above, $\Delta\mu_{2i}$ and $\Delta\mu_{1i}$ are as described above (equivalent to `deltaMu2` and `deltaMu1`), $var_{Ni}$ is the common variance across the adjacent normal samples (equivalent to `n.var`), and $var_{Ti}$ is the common variance across the tumor samples (equivalent to `t.var`).
 
-We can now use the `mmParams` dataframe to generate a variety of visualizations and to figure out which of our isoforms in our gene set is most similar in appearance to our idealized oncogene candidate.
+### 2.3 Selecting genes that appear most like idealized oncogene candidate
+
+We can now use the `mmParams` dataframe to figure out which of our isoforms in our gene set are most similar in terms of their distribution to our ideal oncogene candidate.
 
 For example, lets say that we wanted to select a subset of gene isoforms that most resembled the theoretically ideal oncogene. We can capture all of the genes meeting or exceeding specified thresholds using the `topGeneQuant` function. Here, we want to maximize `deltMu2`, minimize `deltMu1`, and maximize the `SI`.
 
@@ -105,9 +117,9 @@ mmParams.top10 = mmParams[1:10,]
 print(mmParams.top10)
 ```
 
-## Visualize the output
+## 3. Visualize the output
 
-### Visualize isoforms with a high SI & oncomix score
+### 3.1 Visualize isoforms with a high SI & oncomix score
 
 Now, we will visualize the distribution of gene expression values for a particular isoform. Specifically, we will create a overlapping histogram of an single isoform's expression values across both tumor (teal) and adjacent normal (red) samples with the best-fitting Gaussian curves superimposed. The isoform that we want to visualize here, uc002jxc.2, is among the 5 isoforms in the output from `topGeneQuant` function. It also ranks 7th out of 4789 isoforms in terms of its oncomix score, so it should have a distributional profile that is more similar to our theoretical oncogene that most other isoforms in this dataset.
 
@@ -136,7 +148,7 @@ We can also highlight where the top 10 isoforms with the highest score fall in t
 scatterMixPlot(mmParams = mmParams, gene_labels = rownames(mmParams.top10))
 ```
 
-### Isoforms that map to oncogenes in an online database
+### 3.2 Visualize the distribution of isoforms that map to oncogenes in an online database
 
 We can check the distribution of the isoforms that map to known human oncogenes. To do this, we will use genes classified as oncogenes from the [ONGene database](http://ongene.bioinfo-minzhao.org/), which is first literature-curated database of oncogenes. This paper was published in 2017. 
 
@@ -147,7 +159,7 @@ We will then map the oncogenes in the database (which are in gene symbols) to uc
 library(RMySQL)
 
 #read in a table of known human oncogenes from the ONGene database
-ongene = read.table("http://ongene.bioinfo-minzhao.org/ongene_human.txt", header = T, sep = "\t")
+ongene = read.table("http://ongene.bioinfo-minzhao.org/ongene_human.txt", header = T, sep = "\t", quote = "", stringsAsFactors = FALSE, row.names = NULL)
 
 #send a sql query to UCSC to map the human oncogenes to ucsc isoform ids
 ucsc_genome <- dbConnect(MySQL(), user="genome", 
@@ -181,7 +193,7 @@ If you are interested in a particular oncogene, then you can plug the name of th
 
 Note: Not all well-characterized oncogenes fall into or near the upper right quadrant of this scatterplot (explored more in the analysis below). This is expected because oncogenes can arise via a variety of mechanisms, such as via mutational activation (eg BRAF V600E), which may not be associated with increased expression of the gene. mRNA overexpresion is one of several ways that an oncogene can drive tumor behavior, and it is this class of oncogenes that our method seeks to detect.
 
-### Distribution of the OncoMix score
+### 3c. VIsualize the distribution of the OncoMix score
 
 Lastly, we will check the distribution of the OncoMix `score` across all gene isoforms. The histograms are superimposed and are colored by whether the isoform maps to a gene in the ONGene database (orange, n = `r table(is.na(mmParams.m$geneSymbol))[1]`) or not (purple, n = `r table(is.na(mmParams.m$geneSymbol))[2]`).
 
@@ -196,7 +208,7 @@ ggplot(mmParams.m, aes(x = score, y = ..density.., fill=is.na(geneSymbol))) +
 
 The distribution of the OncoMix scores looks equivalent between isoforms in the ONGene database versus those not in the ONGene database. However, the short right tail of this distribution, which contains isoforms with high scores, also preferentially consists of isoforms that map to genes in the ONGene database. In addition, the few isoforms that are not in the ONGene database and that have high scores may represent oncogenes that are yet to be discovered.
 
-## Session Info
+## 4. Session Info
 
 ```{r}
 sessionInfo()

@@ -14,8 +14,8 @@ This function allows you to generate a schematic of the assumptions of a traditi
 expermiment between two known groups.
 }
 \examples{
-oncoMixBimodal(means = c(3,7))
-oncoMixBimodal(means = c(3,10))
+oncoMixTraditionalDE(means = c(3,7))
+oncoMixTraditionalDE(means = c(3,10))
 }
 \keyword{differential}
 \keyword{expression}

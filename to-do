@@ -7,3 +7,23 @@ To do:
   - Link to existing oncogene databases
   - Automatically plot distribution of genes when you click on a dot.
   - Give metadata about gene (where it is, how is it related to other genes)
+
+
+** Completed
+
+- Contain a DESCRIPTION file with valid contact information, an informative title and description, correct license specification, appropriate biocViews terms, valid version number.
+
+** To do:
+- Pass R CMD build, R CMD check, and R CMD BiocCheck (see the R CMD check cheatsheet and the BiocCheck package) on all supported platforms (Windows, Macintosh, Linux) with no errors or - warnings, using an appropiate version of R. To work out which version that is, see useDevel.
+- The result of R CMD build must be less than 4MB;
+- R CMD check must complete within 5 minutes.
+
+- Set Version: 0.99.0 in the DESCRIPTION. Subsequent versions created during the review process will be numbered 0.99.1, 0.99.2, etc. When released, your package’s version number will be automatically incremented to 1.0.0.
+- Contain a NAMESPACE that imports all symbols used in the package, and exports just those symbols the package author identifies as appropriate. Use of a NAMESPACE implies that appropriate packages are mentioned in the Imports: field of the DESCRIPTION file.
+- Contain a vignette that illustrates the major uses of the package. The vignette must be evaluated during package installation; a static vignette is not acceptable.
+- Contain comprehensive help pages. This includes accurate description of function parameter and return values, and meaningful examples.
+- Make use of appropriate existing packages (e.g., biomaRt, AnnotationDbi, Biostrings) and classes (e.g., ExpressionSet, AnnotatedDataFrame, RangedData, Rle, DNAStringSet) to avoid - duplication of functionality available in other Bioconductor packages.
+- Contain no extraneous files (e.g., ‘.DS_Store’, ‘.project’, ‘.svn’, etc.), files with invalid names (e.g., differing only in case), or code that cannot be distributed under the license - specified by the author.
+- Packages should have a descriptive name that is not already in use. See if it is by running biocLite("myPackageName"). You cannot have a package name that is case-insensitively equal to an existing package name in CRAN or Bioconductor.
+- Follow the Package Guidelines for details on appropriate use.
+- Include an inst/NEWS file for providing users with information on package updates.

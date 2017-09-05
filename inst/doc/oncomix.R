@@ -47,7 +47,7 @@ scatterMixPlot(mmParams = mmParams, gene_labels = rownames(mmParams.top10))
 library(RMySQL)
 
 #read in a table of known human oncogenes from the ONGene database
-ongene = read.table("http://ongene.bioinfo-minzhao.org/ongene_human.txt", header = T, sep = "\t")
+ongene = read.table("http://ongene.bioinfo-minzhao.org/ongene_human.txt", header = T, sep = "\t", quote = "", stringsAsFactors = FALSE, row.names = NULL)
 
 #send a sql query to UCSC to map the human oncogenes to ucsc isoform ids
 ucsc_genome <- dbConnect(MySQL(), user="genome", 
