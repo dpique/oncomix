@@ -24,7 +24,10 @@ from tumor and adjacent normal tissue with the option of including the
 best fitting Gaussian curve.
 }
 \examples{
-plotGeneHist(mmParams, dfNml, dfTumor, isof)
+data(dfTumorIsof, dfNmlIsof, package="oncomix")
+mmParams = mixModelParams(dfNml, dfTumor)
+isof = rownames(mmParams)[1]
+plotGeneHist(mmParams, dfNmlIsof, dfTumorIsof, isof)
 }
 \seealso{
 \code{\link{mixModelParams}}

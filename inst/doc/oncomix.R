@@ -10,6 +10,9 @@ library(ggplot2)
 oncomix::oncoMixIdeal()
 
 ## ------------------------------------------------------------------------
+oncoMixTraditionalDE()
+
+## ------------------------------------------------------------------------
 data(dfNmlIsof, dfTumorIsof, package="oncomix")
 
 dim(dfNmlIsof)
@@ -77,7 +80,6 @@ print(mmParams.m.s)
 scatterMixPlot(mmParams = mmParams, gene_labels = rownames(mmParams.m.s))
 
 ## ------------------------------------------------------------------------
-library(ggplot2)
 library(RColorBrewer)
 col = brewer.pal(3, "Dark2")
 ggplot(mmParams.m, aes(x = score, y = ..density.., fill=is.na(geneSymbol))) +

@@ -1,6 +1,6 @@
 ---
 title: "OncoMix Vignette"
-author: "Daniel Piqué"
+author: "Daniel G. Piqué"
 date: "`r Sys.Date()`"
 output:
   html_document:
@@ -22,7 +22,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
 
 ### 1.1 Motivation for developing OncoMix
 
-The advent of large, well-curated databases, such as the [genomic data commons](https://gdc.cancer.gov/), that contain RNA sequencing data from hundreds of patient tumors has made it possible to identify oncogene candidates based off of mRNA expression alone. OncoMix is the first method developed to identify oncogenes in a visually-interpretable manner from RNA-sequencing data in large cohorts of patients. 
+The advent of large, well-curated databases, such as the [genomic data commons](https://gdc.cancer.gov/), that contain RNA sequencing data from hundreds of patient tumors has made it possible to identify oncogene candidates solely based off of patterns present in mRNA expression data. OncoMix is the first method developed to identify oncogenes in a visually-interpretable manner from RNA-sequencing data in large cohorts of patients. 
 
 OncoMix is an R package for identifying oncogene candidates based off of 2-component Gaussian mixture models. It estimates parameters using the expectation maximization procedure as implemented in the R package mclust. This tutorial will demonstrate how to identify oncogene candidates from a set of mRNA sequencing data. We start by loading the package:
 
@@ -44,11 +44,16 @@ The x-axis represents mRNA expression values, with lower values toward the left 
 
 The advantage of applying a 2-component mixture model is that we are able to capture biologically-relevant clusters of gene expression that may naturally exist in the data. Otherwise, we might represent our data with just a single curve sitting in the middle of what really are 2 distinct clusters. Visually, we see that for a theoretical oncogene, there is a *subgroup* of tumors that overexpresses this gene relative to normal tissue.
 
-We compare our approach to the techniques employed by traditional differential expression analysis (e.g. Student's t-test, as employed by limma, or DESeq2). These approaches make strong assumptions -- namely, that the data from a particular group are well-described by distributions with mass concentrated around a single point (a 'mean', if you will). If we were to use one of these approaches on a large dataset, our assumption would be that oncogenes are overexpressed in *every* tumor sample compared to normal tissue. This assumption can be visualized below:
+### 1.3 Conceptual comparison of oncomix to classical differential expression methods
+
+
+We now conceptually compare oncomix to the techniques employed by traditional differential expression analysis (e.g. Student's t-test, as employed by [limma](https://www.ncbi.nlm.nih.gov/pubmed/25605792), or [DESeq2](https://www.ncbi.nlm.nih.gov/pubmed/25516281)). These approaches make strong assumptions -- namely, that the data from a particular group are well-described by distributions with mass concentrated around a central value (such as a 'mean'). If we were to use one of these approaches on a large dataset, our assumption would be that oncogenes are overexpressed in *every* tumor sample compared to normal tissue. This assumption can be visualized below:
 
 ```{r}
 oncoMixTraditionalDE()
 ```
+
+The red-orange curve represents the gene expression values from the adjacent normal data, and the teal curve represents the gene expression values from the tumor data. Note, however, that the goal for a classical DE analysis, such as that employed by limma, would be to find genes that maximize the difference between these two curves. This approach does not represent our knowledge of how oncogenes are expressed in a population of individuals -- that is, highly expressed in a subset of patient tumors, and lowly expressed in adjacent normal tissue.
 
 ## 2. Identifying Oncogene Candidates 
 
@@ -136,7 +141,7 @@ Here, $\alpha$ (in the title) is a term that is present in the denominator of th
 scatterMixPlot(mmParams)
 ```
 
-We would expect isoforms that maximize deltaMu1 and minimize deltaMu2 to be most visually similar to the theoretical oncogene candidate, and thus to be present within the uppre right quadrant of this histogram. However, due to the large variance displayed by some of these isoforms, not all isoforms in the upper right quadrant appear like the theoreticaly ideal oncogene. We developed an index, termed the selectivity index (SI), that helps highlight genes that follow our ideal profile. The SI ranges from 0 to 1, and genes with a larger selectivity index will follow more closely the ideal oncogene. Now, we will highlight the isoforms with a selectivity index greater than .99 using the `selIndThresh` argument to narrow our search.
+We would expect isoforms that maximize deltaMu1 and minimize deltaMu2 to be most visually similar to the theoretical oncogene candidate, and thus to be present within the upper right quadrant of this histogram. However, due to the large variance displayed by some of these isoforms, not all isoforms in the upper right quadrant appear like the theoreticaly ideal oncogene. We developed an index, termed the selectivity index (SI), that helps highlight genes that follow our ideal profile. The SI ranges from 0 to 1, and genes with a larger selectivity index will follow more closely the ideal oncogene. Now, we will highlight the isoforms with a selectivity index greater than .99 using the `selIndThresh` argument to narrow our search.
 
 ```{r, fig.width = 7, fig.height= 6.5}
 scatterMixPlot(mmParams, selIndThresh = .99)
@@ -193,12 +198,11 @@ If you are interested in a particular oncogene, then you can plug the name of th
 
 Note: Not all well-characterized oncogenes fall into or near the upper right quadrant of this scatterplot (explored more in the analysis below). This is expected because oncogenes can arise via a variety of mechanisms, such as via mutational activation (eg BRAF V600E), which may not be associated with increased expression of the gene. mRNA overexpresion is one of several ways that an oncogene can drive tumor behavior, and it is this class of oncogenes that our method seeks to detect.
 
-### 3c. VIsualize the distribution of the OncoMix score
+### 3c. Visualize the distribution of the OncoMix score
 
 Lastly, we will check the distribution of the OncoMix `score` across all gene isoforms. The histograms are superimposed and are colored by whether the isoform maps to a gene in the ONGene database (orange, n = `r table(is.na(mmParams.m$geneSymbol))[1]`) or not (purple, n = `r table(is.na(mmParams.m$geneSymbol))[2]`).
 
 ```{r}
-library(ggplot2)
 library(RColorBrewer)
 col = brewer.pal(3, "Dark2")
 ggplot(mmParams.m, aes(x = score, y = ..density.., fill=is.na(geneSymbol))) +

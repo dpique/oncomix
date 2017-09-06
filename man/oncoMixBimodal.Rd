@@ -7,7 +7,7 @@
 oncoMixBimodal(oe_means = c(3, 7))
 }
 \arguments{
-\item{means}{Set the values for the difference between parameter means}
+\item{oe_means}{Set the values for the difference between parameter means}
 }
 \description{
 This function allows you to generate a plot

@@ -1,10 +1,11 @@
 Package: oncomix
-Title: Identify Genes Overexpressed in Subsets of Tumors from Tumor-Normal mRNA
+Title: Identifying Genes Overexpressed in Subsets of Tumors from Tumor-Normal mRNA
     Expression Data
 Version: 0.99.0
-Authors@R: person("Daniel", "Piqué", email = "daniel.pique@med.einstein.yu.edu", role = c("aut", "cre"))
+Author: Daniel Pique, John Greally, Jessica Mar
+Maintainer: Daniel Pique <daniel.pique@med.einstein.yu.edu>
 Description: This package helps identify mRNAs that are overexpressed in subsets
-    of tumors relative to normal tissue. Ideal imputs would be paired tumor-normal
+    of tumors relative to normal tissue. Ideal inputs would be paired tumor-normal
     data from the same tissue from many patients (>15 pairs). This unsupervised
     approach relies on the observation that oncogenes are characteristically
     overexpressed in only a subset of tumors in the population, and may help
@@ -24,6 +25,7 @@ Imports:
     ggplot2,
     ggrepel,
     RColorBrewer,
-    mclust
+    mclust,
+    stats
 VignetteBuilder: knitr
 biocViews: GeneExpression

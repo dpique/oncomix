@@ -1,2 +1,0 @@
-"0","topGeneQuant = oncomix::topGeneQuants(mmParams, deltMu2Thresh = 99, deltMu1Thresh = 10, siThresh = .99)"
-"0","print(topGeneQuant)"

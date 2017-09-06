@@ -9,9 +9,15 @@ scatterMixPlot(mmParams, selIndThresh = 1, gene_labels = NULL)
 \arguments{
 \item{mmParams}{The output from the mixModelParams function. Will utilize the deltaMu2
 and deltaMu1 rows}
+
+\item{selIndThresh}{This is the selectivity index threshold to use.
+All genes with SI values above this threshold will be highlighted in purple}
+
+\item{gene_labels}{A character vector of gene names used to label the genes with
+that name on the scatter plot}
 }
 \value{
-Returns a ggplot object that you can plot
+Returns a ggplot scatter object that can be plotted
 }
 \description{
 This function allows you to generate the parameters for two 2-component mixture models
