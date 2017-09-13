@@ -21,7 +21,7 @@ with equal variances from 2 matrices of data with a priori labels (eg tumor vs n
 was originally intended for matrices of gene expression data treated with 2 conditions.
 }
 \examples{
-dfNml = as.data.frame(matrix(data = rgamma(n = 150, shape = 2, rate = 2), nrow = 15, ncol = 10))
+dfNml = as.data.frame(matrix(data=rgamma(n=150, shape = 2, rate=2), nrow=15, ncol=10))
 rownames(dfNml) = paste0("patient.n", 1:nrow(dfNml))
 colnames(dfNml) = paste0("gene", 1:ncol(dfNml))
 

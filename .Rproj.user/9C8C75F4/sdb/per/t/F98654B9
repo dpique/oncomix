@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "Package: oncomix\nTitle: Identifying Genes Overexpressed in Subsets of Tumors from Tumor-Normal mRNA\n    Expression Data\nVersion: 0.99.0\nAuthor: Daniel Pique, John Greally, Jessica Mar\nMaintainer: Daniel Pique <daniel.pique@med.einstein.yu.edu>\nDescription: This package helps identify mRNAs that are overexpressed in subsets\n    of tumors relative to normal tissue. Ideal inputs would be paired tumor-normal\n    data from the same tissue from many patients (>15 pairs). This unsupervised\n    approach relies on the observation that oncogenes are characteristically\n    overexpressed in only a subset of tumors in the population, and may help\n    identify oncogene candidates purely based on differences in mRNA expression\n    between previously unknown subtypes.\nDepends:\n    R (>= 3.3.0)\nLicense: GPL-3\nEncoding: UTF-8\nLazyData: true\nRoxygenNote: 6.0.1\nSuggests:\n    knitr,\n    rmarkdown,\n    testthat,\n    RMySQL\nImports:\n    ggplot2,\n    ggrepel,\n    RColorBrewer,\n    mclust,\n    stats\nVignetteBuilder: knitr\nbiocViews: GeneExpression\n",
+    "created" : 1505323965460.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "989636889",
+    "id" : "F98654B9",
+    "lastKnownWriteTime" : 1505323987,
+    "last_content_update" : 1505323987143,
+    "path" : "//data.einstein.yu.edu/home/dpique/dpLabNotebook/bimodality_brca_tcga/oncomix/DESCRIPTION",
+    "project_path" : "DESCRIPTION",
+    "properties" : {
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "dcf"
+}

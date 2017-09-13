@@ -24,10 +24,17 @@ from tumor and adjacent normal tissue with the option of including the
 best fitting Gaussian curve.
 }
 \examples{
-data(dfTumorIsof, dfNmlIsof, package="oncomix")
-mmParams = mixModelParams(dfNmlIsof, dfTumorIsof)
+dfNml = as.data.frame(matrix(data=rgamma(n=150, shape = 2, rate=2), nrow=15, ncol=10))
+rownames(dfNml) = paste0("patient.n", 1:nrow(dfNml))
+colnames(dfNml) = paste0("gene", 1:ncol(dfNml))
+
+dfTumor = as.data.frame(matrix(data = rgamma(n = 150, shape = 4, rate = 3), nrow = 15, ncol = 10))
+rownames(dfTumor) = paste0("patient.t", 1:nrow(dfTumor))
+colnames(dfTumor) = paste0("gene", 1:ncol(dfTumor))
+
+mmParams = mixModelParams(dfNml, dfTumor)
 isof = rownames(mmParams)[1]
-plotGeneHist(mmParams, dfNmlIsof, dfTumorIsof, isof)
+plotGeneHist(mmParams, dfNml, dfTumor, isof)
 }
 \seealso{
 \code{\link{mixModelParams}}

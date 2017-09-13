@@ -70,10 +70,17 @@ mixModelParams = function(dfNml, dfTumor) {
 #' @return Returns a histogram of the gene expression values from the two groups.
 #' @export
 #' @examples
-#' data(dfTumorIsof, dfNmlIsof, package="oncomix")
-#' mmParams = mixModelParams(dfNmlIsof, dfTumorIsof)
+#' dfNml = as.data.frame(matrix(data=rgamma(n=150, shape = 2, rate=2), nrow=15, ncol=10))
+#' rownames(dfNml) = paste0("patient.n", 1:nrow(dfNml))
+#' colnames(dfNml) = paste0("gene", 1:ncol(dfNml))
+#'
+#' dfTumor = as.data.frame(matrix(data = rgamma(n = 150, shape = 4, rate = 3), nrow = 15, ncol = 10))
+#' rownames(dfTumor) = paste0("patient.t", 1:nrow(dfTumor))
+#' colnames(dfTumor) = paste0("gene", 1:ncol(dfTumor))
+#'
+#' mmParams = mixModelParams(dfNml, dfTumor)
 #' isof = rownames(mmParams)[1]
-#' plotGeneHist(mmParams, dfNmlIsof, dfTumorIsof, isof)
+#' plotGeneHist(mmParams, dfNml, dfTumor, isof)
 #' @seealso \code{\link{mixModelParams}}
 
 plotGeneHist <- function(mmParams, dfNml, dfTumor, isof){
@@ -228,54 +235,23 @@ topGeneQuants = function(mmParams, deltMu2Thresh = 90, deltMu1Thresh = 10, siThr
 }
 
 
+#' Human Breast Cancer RNA-sequencing data from TCGA - Tumor Tissue
+#'
+#' @name dfTumorIsof
+#' @docType data
+#' @author Daniel Pique \email{daniel.pique@med.einstein.yu.edu}
+#' @references \url{https://gdc.cancer.gov/}
+#' @keywords data
+
+NULL
+
+
 #' Human Breast Cancer RNA-sequencing data from TCGA - Adjacent Normal Tissue
 #'
-#' Gene expression data was obtained from The Cancer Genome Atlas (TCGA) servers
-#' and was quantified using Transcripts per Million (TPM). The 4789 isoforms included
-#' here include isoforms whose expression values were unconfounded by technical variables
-#' and that were expressed in at least 20% of TCGA patients. THe data included here
-#' are from adjacent normal breast tissue.
-#'
+#' @name dfNmlIsof
 #' @docType data
-#'
-#' @usage data(dfNmlIsof, package="oncomix")
-#'
-#' @format An object of class \code{"cross"}; see \code{\link[qtl]{read.cross}}.
-#'
-#' @keywords datasets
-#'
-#' @references Data corresponding to The Cancer Genome Altas is hosted here:
-#' (\href{https://gdc.cancer.gov/}{Genomic Data commons})
-#'
-#' @source \href{https://gdc.cancer.gov/}{Genomic Data Commons}
-#'
-#' @examples
-#' data(dfNmlIsof, package="oncomix")
-#' head(dfNmlIsof)
-#' dim(dfNmlIsof)
+#' @author Daniel Pique \email{daniel.pique@med.einstein.yu.edu}
+#' @references \url{https://gdc.cancer.gov/}
+#' @keywords data
 
-
-
-#' #' Human Breast Cancer RNA-sequencing data from TCGA - Tumor Tissue
-#'
-#' Gene expression data was obtained from The Cancer Genome Atlas (TCGA) servers
-#' and was quantified using Transcripts per Million (TPM). The 4789 mRNA isoforms included
-#' here include isoforms whose expression values were unconfounded by technical variables
-#' and that were expressed in at least 20% of TCGA patients. THe data included here
-#' are from breast tumor tissue.
-#'
-#' @docType data
-#'
-#' @usage data(dfTumorIsof, package="oncomix")
-#'
-#' @keywords datasets
-#'
-#' @references Data corresponding to The Cancer Genome Altas is hosted here:
-#' (\href{https://gdc.cancer.gov/}{Genomic Data commons})
-#'
-#' @source \href{https://gdc.cancer.gov/}{Genomic Data Commons}
-#'
-#' @examples
-#' data(dfTumorIsof, package="oncomix")
-#' head(dfTumorIsof)
-#' dim(dfTumorIsof)
+NULL
