@@ -25,7 +25,7 @@ best fitting Gaussian curve.
 }
 \examples{
 data(dfTumorIsof, dfNmlIsof, package="oncomix")
-mmParams = mixModelParams(dfNml, dfTumor)
+mmParams = mixModelParams(dfNmlIsof, dfTumorIsof)
 isof = rownames(mmParams)[1]
 plotGeneHist(mmParams, dfNmlIsof, dfTumorIsof, isof)
 }

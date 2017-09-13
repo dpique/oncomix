@@ -11,10 +11,10 @@ scatterMixPlot(mmParams, selIndThresh = 1, gene_labels = NULL)
 and deltaMu1 rows}
 
 \item{selIndThresh}{This is the selectivity index threshold to use.
-All genes with SI values above this threshold will be highlighted in purple}
+All genes with SI values above this threshold will be highlighted in purple.}
 
 \item{gene_labels}{A character vector of gene names used to label the genes with
-that name on the scatter plot}
+that name on the scatter plot.}
 }
 \value{
 Returns a ggplot scatter object that can be plotted
@@ -24,6 +24,15 @@ This function allows you to generate the parameters for two 2-component mixture 
 with equal variances
 }
 \examples{
+dfNml = as.data.frame(matrix(data = rgamma(n = 150, shape = 2, rate = 2), nrow = 15, ncol = 10))
+rownames(dfNml) = paste0("patient.n", 1:nrow(dfNml))
+colnames(dfNml) = paste0("gene", 1:ncol(dfNml))
+
+dfTumor = as.data.frame(matrix(data = rgamma(n = 150, shape = 4, rate = 3), nrow = 15, ncol = 10))
+rownames(dfTumor) = paste0("patient.t", 1:nrow(dfTumor))
+colnames(dfTumor) = paste0("gene", 1:ncol(dfTumor))
+
+mmParams = mixModelParams(dfNml, dfTumor)
 scatterMixPlot(mmParams)
 }
 \seealso{

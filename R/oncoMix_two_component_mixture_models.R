@@ -12,7 +12,7 @@
 #' @importFrom mclust Mclust mclustBIC
 #' @export
 #' @examples
-#' dfNml = as.data.frame(matrix(data = rgamma(n = 150, shape = 2, rate = 2), nrow = 15, ncol = 10))
+#' dfNml = as.data.frame(matrix(data=rgamma(n=150, shape = 2, rate=2), nrow=15, ncol=10))
 #' rownames(dfNml) = paste0("patient.n", 1:nrow(dfNml))
 #' colnames(dfNml) = paste0("gene", 1:ncol(dfNml))
 #'
@@ -56,64 +56,6 @@ mixModelParams = function(dfNml, dfTumor) {
 }
 
 
-#' Calculate the selectivity Index from getMixModelParams
-#'
-#' This function allows you to generate the parameters for two 2-component mixture models
-#' with equal variances
-#'
-#' @param mmParams The output from the getMixModelParams function. Will utilize the deltaMu2
-#' and deltaMu1 rows
-#' @param dfNml The normal dataframe. Will be used to calculate the SI.
-#' @keywords oncoMix, visualization, two-component
-#' @return Returns a vector, equal in length to the number of genes. 1 SI per gene.
-#' @export
-#' @examples
-#' selectivityIndex(mmParams, dfNml)
-#' @seealso \code{\link{mixModelParams}}
-
-selectivityIndex <- function(mmParams, dfNml){
-  boundaryTumor <- (mmParams[,"t.mu.2"] + mmParams[,"t.mu.1"]) / 2 #this is the boundary between the
-  #tumor samples (classified into hi and low expression)
-  selInd = colSums(dfNml < boundaryTumor) / nrow(dfNml)
-  #How many nml samples are below this threshold?
-  if(colnames(dfNml) == rownames(boundaryTumor)){
-    names(selInd) = rownames(mmParams)
-    return(selInd)
-  } else {
-    return("Error! colnames from dfNml and rownames from mmParams do not match")
-  }
-}
-
-
-#' Plot the selectivity Index from getMixModelParams
-#'
-#' This function allows you to generate the parameters for two 2-component mixture models
-#' with equal variances
-#'
-#' @param mmParams The output from the mixModelParams function. Will utilize the deltaMu2
-#' and deltaMu1 rows
-#' @param dfNml The normal dataframe. Will be used to calculate the SI.
-#' @keywords oncoMix, visualization, two-component
-#' @return Returns a vector, equal in length to the number of genes. 1 SI per gene.
-#' @export
-#' @examples
-#' selectivityIndex(mmParams, dfNml)
-#' @seealso \code{\link{mixModelParams}}
-
-plotSelectivityIndex <- function(mmParams, dfNml){
-  boundaryTumor <- (mmParams[,"t.mu.2"] + mmParams[,"t.mu.1"]) / 2 #this is the boundary between the
-  #tumor samples (classified into hi and low expression)
-  selInd = colSums(dfNml < boundaryTumor) / nrow(dfNml)
-  #How many nml samples are below this threshold?
-  if(colnames(dfNml) == rownames(boundaryTumor)){
-    names(selInd) = rownames(mmParams)
-    return(selInd)
-  } else {
-    return("Error! colnames from dfNml and rownames from mmParams do not match")
-  }
-}
-
-
 #' Plot a histogram of gene expression values from tumor and adjacent normal tissue.
 #'
 #' This function allows you to plot a histogram of gene expression values
@@ -129,7 +71,7 @@ plotSelectivityIndex <- function(mmParams, dfNml){
 #' @export
 #' @examples
 #' data(dfTumorIsof, dfNmlIsof, package="oncomix")
-#' mmParams = mixModelParams(dfNml, dfTumor)
+#' mmParams = mixModelParams(dfNmlIsof, dfTumorIsof)
 #' isof = rownames(mmParams)[1]
 #' plotGeneHist(mmParams, dfNmlIsof, dfTumorIsof, isof)
 #' @seealso \code{\link{mixModelParams}}
@@ -188,6 +130,15 @@ plotGeneHist <- function(mmParams, dfNml, dfTumor, isof){
 #' @importFrom RColorBrewer brewer.pal
 #' @export
 #' @examples
+#' dfNml = as.data.frame(matrix(data = rgamma(n = 150, shape = 2, rate = 2), nrow = 15, ncol = 10))
+#' rownames(dfNml) = paste0("patient.n", 1:nrow(dfNml))
+#' colnames(dfNml) = paste0("gene", 1:ncol(dfNml))
+#'
+#' dfTumor = as.data.frame(matrix(data = rgamma(n = 150, shape = 4, rate = 3), nrow = 15, ncol = 10))
+#' rownames(dfTumor) = paste0("patient.t", 1:nrow(dfTumor))
+#' colnames(dfTumor) = paste0("gene", 1:ncol(dfTumor))
+#'
+#' mmParams = mixModelParams(dfNml, dfTumor)
 #' scatterMixPlot(mmParams)
 #' @seealso \code{\link{mixModelParams}}
 
@@ -253,6 +204,15 @@ scatterMixPlot <- function(mmParams, selIndThresh = 1, gene_labels = NULL){
 #' @import ggplot2 ggrepel stats
 #' @export
 #' @examples
+#' dfNml = as.data.frame(matrix(data = rgamma(n = 150, shape = 2, rate = 2), nrow = 15, ncol = 10))
+#' rownames(dfNml) = paste0("patient.n", 1:nrow(dfNml))
+#' colnames(dfNml) = paste0("gene", 1:ncol(dfNml))
+#'
+#' dfTumor = as.data.frame(matrix(data = rgamma(n = 150, shape = 4, rate = 3), nrow = 15, ncol = 10))
+#' rownames(dfTumor) = paste0("patient.t", 1:nrow(dfTumor))
+#' colnames(dfTumor) = paste0("gene", 1:ncol(dfTumor))
+#'
+#' mmParams = mixModelParams(dfNml, dfTumor)
 #' topGeneQuants(mmParams)
 #' @seealso \code{\link{mixModelParams}}
 
