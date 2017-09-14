@@ -4,10 +4,10 @@
 \alias{oncoMixIdeal}
 \title{Creating an ideal oncomix gene}
 \usage{
-oncoMixIdeal(oe_means = c(3, 7))
+oncoMixIdeal(means = c(3, 7))
 }
 \arguments{
-\item{oe_means}{Set the difference between parameter means for the
+\item{means}{Set the difference between parameter means for the
 overexpressed (oe) group. Defaults to c(3,7)}
 }
 \value{
@@ -19,8 +19,8 @@ subset of tumors
 This function allows you to generate a plot
 }
 \examples{
-oncoMixIdeal(oe_means=c(3,10))
-oncoMixIdeal(oe_means=c(2,18.5))
+oncoMixIdeal(means=c(3,10))
+oncoMixIdeal(means=c(2,18.5))
 }
 \keyword{idealized,}
 \keyword{oncoMix,}

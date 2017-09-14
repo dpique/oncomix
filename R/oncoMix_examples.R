@@ -1,7 +1,7 @@
 #' Creating an ideal oncomix gene
 #'
 #' This function allows you to generate a plot
-#' @param oe_means Set the difference between parameter means for the
+#' @param means Set the difference between parameter means for the
 #' overexpressed (oe) group. Defaults to c(3,7)
 #' @keywords oncoMix, idealized, theoretical
 #' @return Returns a ggplot object that shows the statistical model for an
@@ -9,10 +9,10 @@
 #' subset of tumors
 #' @export
 #' @examples
-#' oncoMixIdeal(oe_means=c(3,10))
-#' oncoMixIdeal(oe_means=c(2,18.5))
+#' oncoMixIdeal(means=c(3,10))
+#' oncoMixIdeal(means=c(2,18.5))
 
-oncoMixIdeal <- function(oe_means=c(3,7)){
+oncoMixIdeal <- function(means=c(3,7)){
     df3 <- data.frame(cbind("expr"=c(rnorm(113, 3), c(rnorm(56,3),
         rnorm(57, mean=6)))), "type"=as.factor(c(rep(2, 113), rep(1,113))))
     type <- expr <- NULL
@@ -31,7 +31,7 @@ oncoMixIdeal <- function(oe_means=c(3,7)){
         axis.ticks.x=element_blank()
         ) +
     ggtitle("Theoretical") +
-    xlim(oe_means[1]-3.2,oe_means[2]+3) +
+    xlim(means[1]-3.2,means[2]+3) +
     stat_function(fun="dnorm",
         colour="#F8766D",
         args=list(mean=3.1, sd=0.7),
@@ -42,27 +42,27 @@ oncoMixIdeal <- function(oe_means=c(3,7)){
         size=3) +
     stat_function(fun="dnorm",
         colour="#00BFC4",
-        args=list(mean=oe_means[1], sd=1),
+        args=list(mean=means[1], sd=1),
         size=3) +
     stat_function(fun="dnorm",
         colour="#00BFC4",
-        args=list(mean=oe_means[2], sd=1),
+        args=list(mean=means[2], sd=1),
         size=3)
 }
 
 #' Creating a schematic of a 2-component mixture model
 #'
 #' This function allows you to generate a plot
-#' @param oe_means Set the values for the difference between parameter means
+#' @param means Set the values for the difference between parameter means
 #' @keywords oncoMix, idealized, theoretical
 #' @return Returns a ggplot object that shows a 2-component Gaussian mixture
 #' model
 #' @export
 #' @examples
-#' oncoMixBimodal(oe_means=c(3,7))
-#' oncoMixBimodal(oe_means=c(3,10))
+#' oncoMixBimodal(means=c(3,7))
+#' oncoMixBimodal(means=c(3,10))
 
-oncoMixBimodal <- function(oe_means=c(3,7)){
+oncoMixBimodal <- function(means=c(3,7)){
     d1 = data.frame(cbind("expr"=c(rnorm(113, 3), c(rnorm(56,3),
         rnorm(57, mean =6)))), "type"=as.factor(c(rep(2, 113), rep(1,113))))
     type <- expr <- NULL
@@ -82,11 +82,11 @@ oncoMixBimodal <- function(oe_means=c(3,7)){
         ggtitle("Theoretical") + xlim(-0.2,10) +
         stat_function(fun=dnorm,
             colour="#00BFC4",
-            args=list(mean=oe_means[1], sd=1),
+            args=list(mean=means[1], sd=1),
             size=5) +
         stat_function(fun=dnorm,
             colour="#00BFC4",
-            args=list(mean=oe_means[2], sd=1),
+            args=list(mean=means[2], sd=1),
             size=5)
 }
 

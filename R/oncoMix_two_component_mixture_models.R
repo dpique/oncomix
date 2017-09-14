@@ -19,51 +19,52 @@
 #' @examples
 #' dfNml <- as.data.frame(matrix(data=rgamma(n=150, shape=2, rate=2),
 #' nrow=15, ncol=10))
-#' rownames(dfNml) <- paste0("patientN_", 1:nrow(dfNml))
+#' rownames(dfNml) <- paste0("patientN", 1:nrow(dfNml))
 #' colnames(dfNml) <- paste0("gene", 1:ncol(dfNml))
 #'
 #' dfTumor <- as.data.frame(matrix(data=rgamma(n=150, shape=4, rate=3),
 #' nrow=15, ncol=10))
-#' rownames(dfTumor) <- paste0("patientT_", 1:nrow(dfTumor))
+#' rownames(dfTumor) <- paste0("patientT", 1:nrow(dfTumor))
 #' colnames(dfTumor) <- paste0("gene", 1:ncol(dfTumor))
 #'
 #' mmParams <- mixModelParams(dfNml, dfTumor)
 
 mixModelParams <- function(dfNml, dfTumor) {
-    params_normal <- apply(dfNml, 2, function(x) {
+    paramsNormal <- apply(dfNml, 2, function(x) {
         y <- mclust::Mclust(data=x, G=2, modelNames="E", verbose=FALSE)
-        z <- c(n.mu=y$parameters$mean,
-            n.var=y$parameters$variance$sigmasq,
-            n.pi.1=y$parameters$pro[1])
+        z <- c(nMu=y$parameters$mean,
+            nVar=y$parameters$variance$sigmasq,
+            nPi1=y$parameters$pro[1])
         return(z)})
 
-    params_tumor <- apply(dfTumor, 2, function(x) {
+    paramsTumor <- apply(dfTumor, 2, function(x) {
         y <- mclust::Mclust(data=x, G=2, modelNames="E", verbose=FALSE)
-        z <- c(t.mu=y$parameters$mean,
-            t.var=y$parameters$variance$sigmasq,
-            t.pi.1=y$parameters$pro[1])
+        z <- c(tMu=y$parameters$mean,
+            tVar=y$parameters$variance$sigmasq,
+            tPi1=y$parameters$pro[1])
         return(z)})
 
-    params <- rbind(params_normal, params_tumor)
-    deltaMu2 <- params["t.mu.2",]-params["n.mu.2",]
-    deltaMu1 <- params["t.mu.1",]-params["n.mu.1",]
-    boundaryTumor <- (params["t.mu.2",] + params["t.mu.1",]) / 2
+    params <- rbind(paramsNormal, paramsTumor)
+    rownames(params)[c(1:2, 5:6)] = c("nMu1","nMu2","tMu1", "tMu2")
+    deltaMu2 <- params["tMu2",]-params["nMu2",]
+    deltaMu1 <- params["tMu1",]-params["nMu1",]
+    boundaryTumor <- (params["tMu2",] + params["tMu1",]) / 2
 
-    si_calc <- function(vectNml, boundTumor){ #calculate the sel. idx
+    siCalc <- function(vectNml, boundTumor){ #calculate the sel. idx
         x <- sum(boundTumor > vectNml) / length(vectNml)
         return(x)
     }
     SI <- sapply(1:ncol(dfNml),
-            function(i) si_calc(dfNml[,i], boundaryTumor[i]))
+            function(i) siCalc(dfNml[,i], boundaryTumor[i]))
 
     params <- rbind(params, deltaMu2, deltaMu1, SI)
-    mmParams.df <- data.frame(t(params))
+    mmParamsDf <- data.frame(t(params))
     score <- NA
-    mmParams.df$score <- mmParams.df$SI*{
-        (mmParams.df$deltaMu2-mmParams.df$deltaMu1)-
-        (mmParams.df$n.var+mmParams.df$t.var)}
-    mmParams.df.s <- mmParams.df[with(mmParams.df, order(-score)), ]
-    return(mmParams.df.s)
+    mmParamsDf$score <- mmParamsDf$SI*{
+        (mmParamsDf$deltaMu2-mmParamsDf$deltaMu1)-
+        (mmParamsDf$nVar+mmParamsDf$tVar)}
+    mmParamsDfS <- mmParamsDf[with(mmParamsDf, order(-score)), ]
+    return(mmParamsDfS)
 }
 
 
@@ -85,12 +86,12 @@ mixModelParams <- function(dfNml, dfTumor) {
 #' @examples
 #' dfNml <- as.data.frame(matrix(data=rgamma(n=150, shape=2, rate=2),
 #' nrow=15, ncol=10))
-#' rownames(dfNml) <- paste0("patient.n", 1:nrow(dfNml))
+#' rownames(dfNml) <- paste0("patientN", 1:nrow(dfNml))
 #' colnames(dfNml) <- paste0("gene", 1:ncol(dfNml))
 #'
 #' dfTumor <- as.data.frame(matrix(data=rgamma(n=150, shape=4, rate=3),
 #' nrow=15, ncol=10))
-#' rownames(dfTumor) <- paste0("patient.t", 1:nrow(dfTumor))
+#' rownames(dfTumor) <- paste0("patientT", 1:nrow(dfTumor))
 #' colnames(dfTumor) <- paste0("gene", 1:ncol(dfTumor))
 #'
 #' mmParams <- mixModelParams(dfNml, dfTumor)
@@ -99,18 +100,18 @@ mixModelParams <- function(dfNml, dfTumor) {
 #' @seealso \code{\link{mixModelParams}}
 
 plotGeneHist <- function(mmParams, dfNml, dfTumor, isof){
-    tidy_df <- as.data.frame(cbind(as.numeric(c(dfTumor[,isof], dfNml[,isof])),
+    tidyDf <- as.data.frame(cbind(as.numeric(c(dfTumor[,isof], dfNml[,isof])),
         as.factor(c(rep("tumor",nrow(dfTumor)), rep("normal",nrow(dfNml))))),
         stringsAsFactors=FALSE)
-    colnames(tidy_df) <- c("expr", "type")
+    colnames(tidyDf) <- c("expr", "type")
     expr <- type <- ..density.. <- NULL # Setting the variables to NULL first
-    p1 <- ggplot(tidy_df, aes(x=expr, color=as.factor(type),
+    p1 <- ggplot(tidyDf, aes(x=expr, color=as.factor(type),
         fill=as.factor(type),
         group=as.factor(type))) +
     theme_classic() +
-    geom_histogram(data=subset(tidy_df,type == 1),fill="#F8766D",
+    geom_histogram(data=subset(tidyDf,type == 1),fill="#F8766D",
         alpha=0.2, aes(y=..density..)) +
-    geom_histogram(data=subset(tidy_df,type == 2),fill="#00BFC4",
+    geom_histogram(data=subset(tidyDf,type == 2),fill="#00BFC4",
         alpha=0.2, aes(y=..density..)) +
     geom_rug(alpha=0.3, show.legend=FALSE) +
     theme(axis.title.y=element_blank(),
@@ -124,17 +125,17 @@ plotGeneHist <- function(mmParams, dfNml, dfTumor, isof){
         round(mmParams[isof,"SI"],4))) +
     xlab(expression(Log[2] *"(TPM Reads)")) +
     stat_function(fun="dnorm", colour="#F8766D",
-        args=list(mean=mmParams[isof,"n.mu.2"],
-        sd=sqrt(mmParams[isof,"n.var"]))) +
+        args=list(mean=mmParams[isof,"nMu2"],
+        sd=sqrt(mmParams[isof,"nVar"]))) +
     stat_function(fun="dnorm", colour="#F8766D",
-        args=list(mean=mmParams[isof,"n.mu.1"],
-        sd=sqrt(mmParams[isof,"n.var"]))) +
+        args=list(mean=mmParams[isof,"nMu1"],
+        sd=sqrt(mmParams[isof,"nVar"]))) +
     stat_function(fun="dnorm", colour="#00BFC4",
-        args=list(mean=mmParams[isof,"t.mu.2"],
-        sd=sqrt(mmParams[isof,"t.var"]))) +
+        args=list(mean=mmParams[isof,"tMu2"],
+        sd=sqrt(mmParams[isof,"tVar"]))) +
     stat_function(fun="dnorm", colour="#00BFC4",
-        args=list(mean=mmParams[isof,"t.mu.1"],
-        sd=sqrt(mmParams[isof,"t.var"])))
+        args=list(mean=mmParams[isof,"tMu1"],
+        sd=sqrt(mmParams[isof,"tVar"])))
     print(p1)
 }
 
@@ -148,7 +149,7 @@ plotGeneHist <- function(mmParams, dfNml, dfTumor, isof){
 #' the deltaMu2 and deltaMu1 rows
 #' @param selIndThresh This is the selectivity index threshold to use. All
 #' genes with SI values above this threshold will be highlighted in purple.
-#' @param gene_labels A character vector of gene names used to label the
+#' @param geneLabels A character vector of gene names used to label the
 #' genes with that name on the scatter plot.
 #' @keywords oncoMix, visualization, two-component
 #' @return Returns a ggplot scatter object that can be plotted
@@ -158,25 +159,25 @@ plotGeneHist <- function(mmParams, dfNml, dfTumor, isof){
 #' @examples
 #' dfNml <- as.data.frame(matrix(data=rgamma(n=150, shape=2, rate=2),
 #' nrow=15, ncol=10))
-#' rownames(dfNml) <- paste0("patient.n", 1:nrow(dfNml))
+#' rownames(dfNml) <- paste0("patientN", 1:nrow(dfNml))
 #' colnames(dfNml) <- paste0("gene", 1:ncol(dfNml))
 #'
 #' dfTumor <- as.data.frame(matrix(data=rgamma(n=150, shape=4, rate=3),
 #' nrow=15, ncol=10))
-#' rownames(dfTumor) <- paste0("patient.t", 1:nrow(dfTumor))
+#' rownames(dfTumor) <- paste0("patientT", 1:nrow(dfTumor))
 #' colnames(dfTumor) <- paste0("gene", 1:ncol(dfTumor))
 #'
 #' mmParams <- mixModelParams(dfNml, dfTumor)
 #' scatterMixPlot(mmParams)
 #' @seealso \code{\link{mixModelParams}}
 
-scatterMixPlot <- function(mmParams, selIndThresh=1, gene_labels=NULL){
+scatterMixPlot <- function(mmParams, selIndThresh=1, geneLabels=NULL){
     mmParams <- as.data.frame(mmParams)
-    one_over_alpha <- diff(range(mmParams$deltaMu2))
-    alpha1 <- 1/one_over_alpha
+    oneOverAlpha <- diff(range(mmParams$deltaMu2))
+    alpha1 <- 1/oneOverAlpha
 
     quants <- c(0.01, 0.10, 0.50, 0.90, 0.99) #add in the quantiles
-    colors_red <- RColorBrewer::brewer.pal(n=length(quants), name="Reds")
+    colorsRed <- RColorBrewer::brewer.pal(n=length(quants), name="Reds")
 
     deltaMu2Quant <- stats::quantile(mmParams[,"deltaMu2"], quants)
     deltaMu1Quant <- stats::quantile(1/(abs(mmParams[,"deltaMu1"]) + alpha1),
@@ -186,33 +187,33 @@ scatterMixPlot <- function(mmParams, selIndThresh=1, gene_labels=NULL){
         aes(x=deltaMu2, y=1/(abs(deltaMu1) + alpha1))) +
         theme_classic() +
         geom_hline(yintercept=deltaMu1Quant,
-            col=colors_red, size=c(1,1,1,1,1)) +
+            col=colorsRed, size=c(1,1,1,1,1)) +
         geom_vline(xintercept=deltaMu2Quant,
-            col=colors_red, size=c(1,1,1,1,1)) +
+            col=colorsRed, size=c(1,1,1,1,1)) +
         geom_point(alpha=0.5) +
         xlab(expression(paste(Delta, mu[2]))) +
         ylab(expression(paste(frac(1, paste(Delta, mu[1], " + ", alpha)))))
     if(selIndThresh < 1){
-        mmParams.si <- mmParams[mmParams$SI > selIndThresh,]
-        x <- x + geom_point(data=as.data.frame(mmParams.si),
+        mmParamsSi <- mmParams[mmParams$SI > selIndThresh,]
+        x <- x + geom_point(data=as.data.frame(mmParamsSi),
             aes(x=deltaMu2, y=1/(abs(deltaMu1)+alpha1)),
             size=10, alpha=0.1,
-            col=colors_red[length(colors_red)],
-            fill=colors_red[length(colors_red)]) +
+            col=colorsRed[length(colorsRed)],
+            fill=colorsRed[length(colorsRed)]) +
         ggtitle(bquote(Distribution~of~Mixture~Model~
             Parameters*","~alpha~"="~.(round(alpha1,2))*", SI >"~
             .(selIndThresh)))
-    } else if(!is.null(gene_labels)){
-        mmParams.si <- mmParams[gene_labels,]
-        mmParams.si$gene_labels <- gene_labels
-        x <- x + geom_point(data=as.data.frame(mmParams.si),
+    } else if(!is.null(geneLabels)){
+        mmParamsSi <- mmParams[geneLabels,]
+        mmParamsSi$geneLabels <- geneLabels
+        x <- x + geom_point(data=as.data.frame(mmParamsSi),
             aes(x=deltaMu2, y=1/(abs(deltaMu1)+alpha1)),
             size=10, alpha=0.1,
-            col=colors_red[length(colors_red)],
-            fill=colors_red[length(colors_red)]) +
-        ggrepel::geom_text_repel(data=mmParams.si, aes(x=deltaMu2,
+            col=colorsRed[length(colorsRed)],
+            fill=colorsRed[length(colorsRed)]) +
+        ggrepel::geom_text_repel(data=mmParamsSi, aes(x=deltaMu2,
             y=1/(abs(deltaMu1)+alpha1)),
-            label=rownames(mmParams.si)) +
+            label=rownames(mmParamsSi)) +
         ggtitle(bquote(Distribution~of~Mixture~Model~
             Parameters*","~alpha~"="~.(round(alpha1,2))))
     } else {
@@ -255,15 +256,15 @@ scatterMixPlot <- function(mmParams, selIndThresh=1, gene_labels=NULL){
 #' @seealso \code{\link{mixModelParams}}
 
 topGeneQuants <- function(mmParams, deltMu2Thr=90, deltMu1Thr=10, siThr=.99){
-    mmParams.df <- as.data.frame(mmParams)
-    deltaMu2Quant <- stats::quantile(mmParams.df$deltaMu2, deltMu2Thr*.01)
-    deltaMu1Quant <- stats::quantile(abs(mmParams.df$deltaMu1),
+    mmParamsDf <- as.data.frame(mmParams)
+    deltaMu2Quant <- stats::quantile(mmParamsDf$deltaMu2, deltMu2Thr*.01)
+    deltaMu1Quant <- stats::quantile(abs(mmParamsDf$deltaMu1),
         {100-deltMu1Thr}*.01)
-    mmParams.df <- as.data.frame(mmParams)
-    tfVect <- mmParams.df$deltaMu2 > deltaMu2Quant &
-        abs(mmParams.df$deltaMu1) < deltaMu1Quant & mmParams.df$SI > siThr
-    mmParams.df.quantSubset <- mmParams.df[tfVect,]
-    return(mmParams.df.quantSubset)
+    mmParamsDf <- as.data.frame(mmParams)
+    tfVect <- mmParamsDf$deltaMu2 > deltaMu2Quant &
+        abs(mmParamsDf$deltaMu1) < deltaMu1Quant & mmParamsDf$SI > siThr
+    mmParamsDfQuantSubset <- mmParamsDf[tfVect,]
+    return(mmParamsDfQuantSubset)
 }
 
 
@@ -273,7 +274,7 @@ topGeneQuants <- function(mmParams, deltMu2Thr=90, deltMu1Thr=10, siThr=.99){
 #' @docType data
 #' @author Daniel Pique \email{daniel.pique@med.einstein.yu.edu}
 #' @references \url{https://gdc.cancer.gov/}
-#' @keywords data
+#' @keywords RNA expression, Breast Tumor
 
 NULL
 
@@ -284,6 +285,6 @@ NULL
 #' @docType data
 #' @author Daniel Pique \email{daniel.pique@med.einstein.yu.edu}
 #' @references \url{https://gdc.cancer.gov/}
-#' @keywords data
+#' @keywords RNA expression, Breast Tissue
 
 NULL

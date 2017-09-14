@@ -4,10 +4,10 @@
 \alias{oncoMixBimodal}
 \title{Creating a schematic of a 2-component mixture model}
 \usage{
-oncoMixBimodal(oe_means = c(3, 7))
+oncoMixBimodal(means = c(3, 7))
 }
 \arguments{
-\item{oe_means}{Set the values for the difference between parameter means}
+\item{means}{Set the values for the difference between parameter means}
 }
 \value{
 Returns a ggplot object that shows a 2-component Gaussian mixture
@@ -17,8 +17,8 @@ model
 This function allows you to generate a plot
 }
 \examples{
-oncoMixBimodal(oe_means=c(3,7))
-oncoMixBimodal(oe_means=c(3,10))
+oncoMixBimodal(means=c(3,7))
+oncoMixBimodal(means=c(3,10))
 }
 \keyword{idealized,}
 \keyword{oncoMix,}

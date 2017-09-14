@@ -110,15 +110,15 @@ number of rows can vary.
 data(dfNmlIsof, dfTumorIsof, package="oncomix")
 
 dim(dfNmlIsof)
-dfNmlIsof[1:5, 1:5] #take a look at the matrix of mRNA expression 
-#data from adjacent normal samples
+dfNmlIsof[1:5, 1:5] 
+##look at the matrix of mRNA expression data from adjacent normal samples
 
 dim(dfTumorIsof)
-dfTumorIsof[1:5, 1:5] #take a look at the matrix of mRNA expression 
-#data from tumors
+dfTumorIsof[1:5, 1:5] 
+#$look at the matrix of mRNA expression data from tumors
 
-mmParams <- oncomix::mixModelParams(dfNmlIsof, dfTumorIsof) #fits 
-#the mixture models, will take a few minutes
+mmParams <- oncomix::mixModelParams(dfNmlIsof, dfTumorIsof) 
+##fits the mixture models, will take a few minutes
 head(mmParams)
 ```
 
@@ -128,31 +128,31 @@ according to the `score` column, with the first row containing the highest
 oncomix score (defined below). The meaning of the dataframe columns are
 described below:
 
-    - `n.mu.1` = the mean ($\mu$) of the Gaussian curve with the smaller mean
+    - `nMu1` = the mean ($\mu$) of the Gaussian curve with the smaller mean
     fit to the adjacent normal expression data (referred to as Mode 1).
-    - `n.mu.2` = the mean ($\mu$) of the Gaussian curve with the larger mean fit
+    - `nMu2` = the mean ($\mu$) of the Gaussian curve with the larger mean fit
     to the adjacent normal expression data (referred to as Mode 2).
-    - `n.var` = the variance ($\sigma$) of the two Gaussian curves fit to the
+    - `nVar` = the variance ($\sigma$) of the two Gaussian curves fit to the
     adjacent normal expression data (fixed to be equal between the two curves)
-    - `n.pi.1` = the proportion of adjacent normal samples assigned to the
-    Gaussian curve with mean `n.mu.1`
+    - `nPi1` = the proportion of adjacent normal samples assigned to the
+    Gaussian curve with mean `nMu1`
 
-    - `t.mu.1` = the mean ($\mu$) of the Gaussian curve with the smaller mean
+    - `tMu1` = the mean ($\mu$) of the Gaussian curve with the smaller mean
     fit to the tumor expression data (referred to as Mode 1).
-    - `t.mu.2` = the mean ($\mu$) of the Gaussian curve with the larger mean fit
+    - `tMu2` = the mean ($\mu$) of the Gaussian curve with the larger mean fit
     to the tumor expression data. (referred to as Mode 2).
-    - `t.var` = the variance ($\sigma$) of the two Gaussian curves fit to the
+    - `tVar` = the variance ($\sigma$) of the two Gaussian curves fit to the
     tumor expression data (fixed to be equal between the two curves).
-    - `t.pi.1` = the proportion of tumor samples assigned to the Gaussian curve
-    with mean `t.mu.1`.
+    - `tPi1` = the proportion of tumor samples assigned to the Gaussian curve
+    with mean `tMu1`.
 
     - `deltaMu2` = the difference between the means of the two curves between
-    groups. `t.mu.2` - `n.mu.2`. May be negative or positive.
+    groups. `tMu2` - `nMu2`. May be negative or positive.
     - `deltaMu1` = the difference between the means of the two curves between
-    groups. `t.mu.1` - `n.mu.1`. May be negative or positive.
+    groups. `tMu1` - `nMu1`. May be negative or positive.
     - `SI` = the selectivity index, or the proportion of adjacent normal samples
-    with expression values less than the boundary defined by `t.mu.2` -
-    `t.mu.1`. The selectivity index for the ith gene is computed as:
+    with expression values less than the boundary defined by `tMu2` -
+    `tMu1`. The selectivity index for the ith gene is computed as:
 
     $$SI_i  = \frac{1}{N}\sum_{j=1}^N \Bigg\{ \begin{array}{ll} 1,~ if~x_{ij} <
     \frac{\mu_{iLT}+\mu_{iHT}}{2}  \\ 
@@ -174,7 +174,7 @@ described below:
     $\Delta\mu_{1i}$ are as described above (equivalent to `deltaMu2` and
     `deltaMu1`), $var_{Ni}$ is the common variance across the adjacent normal
     samples (equivalent to `n.var`), and $var_{Ti}$ is the common variance
-    across the tumor samples (equivalent to `t.var`).
+    across the tumor samples (equivalent to `tVar`).
 
 ### 2.3 Selecting genes that appear most like idealized oncogene candidate
 
@@ -188,8 +188,8 @@ meeting or exceeding specified thresholds using the `topGeneQuant` function.
 Here, we want to maximize `deltMu2`, minimize `deltMu1`, and maximize the `SI`.
 
 ```{r}
-topGeneQuant <- oncomix::topGeneQuants(mmParams, deltMu2Thresh=99, 
-    deltMu1Thresh=10, siThresh=.99)
+topGeneQuant <- oncomix::topGeneQuants(mmParams, deltMu2Thr=99, 
+    deltMu1Thr=10, siThr=.99)
 print(topGeneQuant)
 ```
 
@@ -204,8 +204,8 @@ dataframe sorted by the score, with the 1st row containing the isoform with the
 highest score. There is an explanation of how the score is calculated above.
 
 ```{r}
-mmParams.top10 <- mmParams[1:10,]
-print(mmParams.top10)
+mmParamsTop10 <- mmParams[1:10,]
+print(mmParamsTop10)
 ```
 
 ## 3. Visualize the output
@@ -262,7 +262,7 @@ We can also highlight where the top 10 isoforms with the highest score fall in
 the scatterplot.
 
 ```{r}
-scatterMixPlot(mmParams=mmParams, gene_labels=rownames(mmParams.top10))
+scatterMixPlot(mmParams=mmParams, geneLabels=rownames(mmParamsTop10))
 ```
 
 ### 3.2 Visualize the distribution of isoforms that map to oncogenes in an
@@ -301,19 +301,19 @@ query_res <- dbGetQuery(ucsc_genome,
 dbDisconnect(ucsc_genome)
 
 #Merge the query_res & mmParams dataframes
-query_res$kgID.s <- substr(query_res$kgID, 1, 8)
-mmParams$kgID.s <- substr(rownames(mmParams), 1, 8)
+query_res$kgIDs <- substr(query_res$kgID, 1, 8)
+mmParams$kgIDs <- substr(rownames(mmParams), 1, 8)
 mmParams$kgID <- rownames(mmParams)
-mmParams.m <- merge(mmParams, query_res, by="kgID.s", all.x=TRUE)
-rownames(mmParams.m) <- mmParams.m$kgID.x
+mmParamsMg <- merge(mmParams, query_res, by="kgIDs", all.x=TRUE)
+rownames(mmParamsMg) <- mmParamsMg$kgID.x
 
 # Show the top 5 isoforms with the highest score 
 #in our dataset that map to known oncogenes
-mmParams.m <- mmParams.m[with(mmParams.m, order(-score)), ]
-mmParams.m.s <- subset(mmParams.m, !is.na(geneSymbol))[1:5,]
-print(mmParams.m.s)
+mmParamsMg <- mmParamsMg[with(mmParamsMg, order(-score)), ]
+mmParamsMgSbst <- subset(mmParamsMg, !is.na(geneSymbol))[1:5,]
+print(mmParamsMgSbst)
 
-scatterMixPlot(mmParams=mmParams, gene_labels=rownames(mmParams.m.s))
+scatterMixPlot(mmParams=mmParams, geneLabels=rownames(mmParamsMgSbst))
 ```
 
 If you are interested in a particular oncogene, then you can plug the name of
@@ -334,16 +334,16 @@ method seeks to detect.
 Lastly, we will check the distribution of the OncoMix `score` across all gene
 isoforms. The histograms are superimposed and are colored by whether the isoform
 maps to a gene in the ONGene database (orange, n = `r
-table(is.na(mmParams.m$geneSymbol))[1]`) or not (purple, n = `r
-table(is.na(mmParams.m$geneSymbol))[2]`).
+table(is.na(mmParamsMg$geneSymbol))[1]`) or not (purple, n = `r
+table(is.na(mmParamsMg$geneSymbol))[2]`).
 
 ```{r}
 library(RColorBrewer)
 col <- brewer.pal(3, "Dark2")
-ggplot(mmParams.m, aes(x=score, y=..density.., fill=is.na(geneSymbol))) +
-    geom_histogram(data=subset(mmParams.m, is.na(geneSymbol)), 
+ggplot(mmParamsMg, aes(x=score, y=..density.., fill=is.na(geneSymbol))) +
+    geom_histogram(data=subset(mmParamsMg, is.na(geneSymbol)), 
         fill=col[2], alpha=0.5) + 
-    geom_histogram(data=subset(mmParams.m, !is.na(geneSymbol)), 
+    geom_histogram(data=subset(mmParamsMg, !is.na(geneSymbol)), 
         fill=col[3], alpha=0.5) +   
     theme_classic() + xlab("OncoMix Score") + theme_classic() 
 ```

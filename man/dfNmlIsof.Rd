@@ -13,4 +13,7 @@ Human Breast Cancer RNA-sequencing data from TCGA - Adj. Normal Tissue
 \author{
 Daniel Pique \email{daniel.pique@med.einstein.yu.edu}
 }
-\keyword{data}
+\keyword{Breast}
+\keyword{RNA}
+\keyword{Tissue}
+\keyword{expression,}
