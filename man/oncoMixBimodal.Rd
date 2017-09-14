@@ -13,8 +13,8 @@ oncoMixBimodal(oe_means = c(3, 7))
 This function allows you to generate a plot
 }
 \examples{
-oncoMixBimodal(oe_means = c(3,7))
-oncoMixBimodal(oe_means = c(3,10))
+oncoMixBimodal(oe_means=c(3,7))
+oncoMixBimodal(oe_means=c(3,10))
 }
 \keyword{idealized,}
 \keyword{oncoMix,}

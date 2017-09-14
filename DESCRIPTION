@@ -12,7 +12,7 @@ Description: This package helps identify mRNAs that are overexpressed in subsets
     identify oncogene candidates purely based on differences in mRNA expression
     between previously unknown subtypes.
 Depends:
-    R (>= 3.3.0)
+    R (>= 3.4.0)
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

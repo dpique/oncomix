@@ -2,34 +2,41 @@
 % Please edit documentation in R/oncoMix_two_component_mixture_models.R
 \name{mixModelParams}
 \alias{mixModelParams}
-\title{Generate the parameters for two 2-component Gaussian mixture models with equal variances}
+\title{Generate the parameters for two 2-component Gaussian mixture models
+with equal variances}
 \usage{
 mixModelParams(dfNml, dfTumor)
 }
 \arguments{
-\item{dfNml}{A dataframe of normal data containing patients as rows and genes as columns}
+\item{dfNml}{A dataframe of normal data containing patients as rows and
+genes as columns}
 
-\item{dfTumor}{A dataframe of tumor data containing patients as rows and genes as columns}
+\item{dfTumor}{A dataframe of tumor data containing patients as rows and
+genes as columns}
 }
 \value{
-Returns a list of length 2, each element of which contains the parameters
-for the Normal or the Tumor data in a 3 x n matrix, where n is the number of patient samples
+Returns a list of length 2, each element of which contains the
+parameters for the Normal or the Tumor data in a 3 x n matrix, where n
+is the number of patient samples
 }
 \description{
-This function allows you to generate the parameters for two 2-component Gaussian mixture model
-with equal variances from 2 matrices of data with a priori labels (eg tumor vs normal.) This application
-was originally intended for matrices of gene expression data treated with 2 conditions.
+This function allows you to generate the parameters for two 2-component
+Gaussian mixture model with equal variances from 2 matrices of data with
+a priori labels (eg tumor vs normal.) This application was originally
+intended for matrices of gene expression data treated with 2 conditions.
 }
 \examples{
-dfNml = as.data.frame(matrix(data=rgamma(n=150, shape = 2, rate=2), nrow=15, ncol=10))
-rownames(dfNml) = paste0("patient.n", 1:nrow(dfNml))
-colnames(dfNml) = paste0("gene", 1:ncol(dfNml))
+dfNml <- as.data.frame(matrix(data=rgamma(n=150, shape=2, rate=2),
+nrow=15, ncol=10))
+rownames(dfNml) <- paste0("patientN_", 1:nrow(dfNml))
+colnames(dfNml) <- paste0("gene", 1:ncol(dfNml))
 
-dfTumor = as.data.frame(matrix(data = rgamma(n = 150, shape = 4, rate = 3), nrow = 15, ncol = 10))
-rownames(dfTumor) = paste0("patient.t", 1:nrow(dfTumor))
-colnames(dfTumor) = paste0("gene", 1:ncol(dfTumor))
+dfTumor <- as.data.frame(matrix(data=rgamma(n=150, shape=4, rate=3),
+nrow=15, ncol=10))
+rownames(dfTumor) <- paste0("patientT_", 1:nrow(dfTumor))
+colnames(dfTumor) <- paste0("gene", 1:ncol(dfTumor))
 
-mmParams = mixModelParams(dfNml, dfTumor)
+mmParams <- mixModelParams(dfNml, dfTumor)
 }
 \keyword{mixture-model,}
 \keyword{oncoMix,}
