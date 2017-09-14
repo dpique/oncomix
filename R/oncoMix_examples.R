@@ -1,10 +1,12 @@
-
-#' Creating an ideal oncoMix gene
+#' Creating an ideal oncomix gene
 #'
 #' This function allows you to generate a plot
-#' @param oe_means Set the difference between parameter means for
-#' the overexpressed (oe) group. Defaults to c(3,7)
+#' @param oe_means Set the difference between parameter means for the
+#' overexpressed (oe) group. Defaults to c(3,7)
 #' @keywords oncoMix, idealized, theoretical
+#' @return Returns a ggplot object that shows the statistical model for an
+#' idealized/theoretical oncogene candidate mRNA that is overexpressed in a
+#' subset of tumors
 #' @export
 #' @examples
 #' oncoMixIdeal(oe_means=c(3,10))
@@ -48,11 +50,13 @@ oncoMixIdeal <- function(oe_means=c(3,7)){
         size=3)
 }
 
-#' Creating an schematic of a 2-component mixture model
+#' Creating a schematic of a 2-component mixture model
 #'
 #' This function allows you to generate a plot
 #' @param oe_means Set the values for the difference between parameter means
 #' @keywords oncoMix, idealized, theoretical
+#' @return Returns a ggplot object that shows a 2-component Gaussian mixture
+#' model
 #' @export
 #' @examples
 #' oncoMixBimodal(oe_means=c(3,7))
@@ -86,12 +90,14 @@ oncoMixBimodal <- function(oe_means=c(3,7)){
             size=5)
 }
 
-#' Creating an schematic of a traditional differential expression experiment
+#' Creating a schematic of a traditional diff. expression experiment
 #'
-#' This function allows you to generate a schematic of the assumptions of a traditional DE
-#' expermiment between two known groups.
+#' This function allows you to generate a schematic of the assumptions of a
+#' traditional DE expermiment between two known groups.
 #' @param means Set the values for the difference between parameter means
 #' @keywords oncoMix, idealized, theoretical, differential expression
+#' @return Returns a ggplot object that shows the traditional method (2 sample
+#' t-test) for mRNA differential expression.
 #' @export
 #' @examples
 #' oncoMixTraditionalDE(means=c(3,7))
@@ -123,5 +129,5 @@ oncoMixTraditionalDE <- function(means=c(3,7)){
         stat_function(fun="dnorm",
             colour="#00BFC4",
             args=list(mean=means[2], sd=1),
-            size=5) #+
+            size=5)
 }

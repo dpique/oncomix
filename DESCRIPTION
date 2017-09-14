@@ -29,4 +29,4 @@ Imports:
     mclust,
     stats
 VignetteBuilder: knitr
-biocViews: GeneExpression
+biocViews: GeneExpression, Sequencing

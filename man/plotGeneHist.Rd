@@ -2,7 +2,8 @@
 % Please edit documentation in R/oncoMix_two_component_mixture_models.R
 \name{plotGeneHist}
 \alias{plotGeneHist}
-\title{Plot a histogram of gene expression values from tumor and adjacent normal tissue.}
+\title{Plot a histogram of gene expression values from
+tumor and adjacent normal tissue.}
 \usage{
 plotGeneHist(mmParams, dfNml, dfTumor, isof)
 }
@@ -16,19 +17,22 @@ plotGeneHist(mmParams, dfNml, dfTumor, isof)
 \item{isof}{The gene isoform to visualize}
 }
 \value{
-Returns a histogram of the gene expression values from the two groups.
+Returns a histogram of the gene expression
+values from the two groups.
 }
 \description{
-This function allows you to plot a histogram of gene expression values
-from tumor and adjacent normal tissue with the option of including the
-best fitting Gaussian curve.
+This function allows you to plot a histogram of gene expression values from
+tumor and adjacent normal tissue with the option of including the best
+fitting Gaussian curve.
 }
 \examples{
-dfNml <- as.data.frame(matrix(data=rgamma(n=150, shape=2, rate=2), nrow=15, ncol=10))
+dfNml <- as.data.frame(matrix(data=rgamma(n=150, shape=2, rate=2),
+nrow=15, ncol=10))
 rownames(dfNml) <- paste0("patient.n", 1:nrow(dfNml))
 colnames(dfNml) <- paste0("gene", 1:ncol(dfNml))
 
-dfTumor <- as.data.frame(matrix(data=rgamma(n=150, shape=4, rate=3), nrow=15, ncol=10))
+dfTumor <- as.data.frame(matrix(data=rgamma(n=150, shape=4, rate=3),
+nrow=15, ncol=10))
 rownames(dfTumor) <- paste0("patient.t", 1:nrow(dfTumor))
 colnames(dfTumor) <- paste0("gene", 1:ncol(dfTumor))
 

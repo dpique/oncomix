@@ -2,13 +2,18 @@
 % Please edit documentation in R/oncoMix_examples.R
 \name{oncoMixIdeal}
 \alias{oncoMixIdeal}
-\title{Creating an ideal oncoMix gene}
+\title{Creating an ideal oncomix gene}
 \usage{
 oncoMixIdeal(oe_means = c(3, 7))
 }
 \arguments{
-\item{oe_means}{Set the difference between parameter means for
-the overexpressed (oe) group. Defaults to c(3,7)}
+\item{oe_means}{Set the difference between parameter means for the
+overexpressed (oe) group. Defaults to c(3,7)}
+}
+\value{
+Returns a ggplot object that shows the statistical model for an
+idealized/theoretical oncogene candidate mRNA that is overexpressed in a
+subset of tumors
 }
 \description{
 This function allows you to generate a plot

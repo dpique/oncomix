@@ -58,6 +58,7 @@ mixModelParams <- function(dfNml, dfTumor) {
 
     params <- rbind(params, deltaMu2, deltaMu1, SI)
     mmParams.df <- data.frame(t(params))
+    score <- NA
     mmParams.df$score <- mmParams.df$SI*{
         (mmParams.df$deltaMu2-mmParams.df$deltaMu1)-
         (mmParams.df$n.var+mmParams.df$t.var)}
@@ -69,9 +70,9 @@ mixModelParams <- function(dfNml, dfTumor) {
 #' Plot a histogram of gene expression values from
 #' tumor and adjacent normal tissue.
 #'
-#' This function allows you to plot a histogram of gene expression values
-#' from tumor and adjacent normal tissue with the option of including the
-#' best fitting Gaussian curve.
+#' This function allows you to plot a histogram of gene expression values from
+#' tumor and adjacent normal tissue with the option of including the best
+#' fitting Gaussian curve.
 #'
 #' @param mmParams The output from the getMixModelParams function.
 #' @param dfNml The normal dataframe.
@@ -227,11 +228,11 @@ scatterMixPlot <- function(mmParams, selIndThresh=1, gene_labels=NULL){
 #' quantiles and that most closely resemble the distribution of oncogenes.
 #'
 #' @param mmParams The output from the mixModelParams function.
-#' @param deltMu2Thresh The percentile threshold for the deltaMu2 statistic.
+#' @param deltMu2Thr The percentile threshold for the deltaMu2 statistic.
 #' All genes exceeding this percentile threshold will be selected.
-#' @param deltMu1Thresh The percentile threshold for the deltaMu1 statistic.
+#' @param deltMu1Thr The percentile threshold for the deltaMu1 statistic.
 #' All genes exceeding this percentile threshold will be selected.
-#' @param siThresh The threshold for the selectivity index statistic
+#' @param siThr The threshold for the selectivity index statistic
 #' (between 0-1). All genes exceeding this threshold will be selected.
 #' @keywords subsetting
 #' @return Returns a dataframe containing all genes meeting the prespecified
@@ -253,15 +254,14 @@ scatterMixPlot <- function(mmParams, selIndThresh=1, gene_labels=NULL){
 #' topGeneQuants(mmParams)
 #' @seealso \code{\link{mixModelParams}}
 
-topGeneQuants <- function(mmParams, deltMu2Thresh=90,
-        deltMu1Thresh=10, siThresh=.99){
+topGeneQuants <- function(mmParams, deltMu2Thr=90, deltMu1Thr=10, siThr=.99){
     mmParams.df <- as.data.frame(mmParams)
-    deltaMu2Quant <- stats::quantile(mmParams.df$deltaMu2, deltMu2Thresh*.01)
+    deltaMu2Quant <- stats::quantile(mmParams.df$deltaMu2, deltMu2Thr*.01)
     deltaMu1Quant <- stats::quantile(abs(mmParams.df$deltaMu1),
-        {100-deltMu1Thresh}*.01)
+        {100-deltMu1Thr}*.01)
     mmParams.df <- as.data.frame(mmParams)
     tfVect <- mmParams.df$deltaMu2 > deltaMu2Quant &
-        abs(mmParams.df$deltaMu1) < deltaMu1Quant & mmParams.df$SI > siThresh
+        abs(mmParams.df$deltaMu1) < deltaMu1Quant & mmParams.df$SI > siThr
     mmParams.df.quantSubset <- mmParams.df[tfVect,]
     return(mmParams.df.quantSubset)
 }
@@ -278,7 +278,7 @@ topGeneQuants <- function(mmParams, deltMu2Thresh=90,
 NULL
 
 
-#' Human Breast Cancer RNA-sequencing data from TCGA - Adjacent Normal Tissue
+#' Human Breast Cancer RNA-sequencing data from TCGA - Adj. Normal Tissue
 #'
 #' @name dfNmlIsof
 #' @docType data

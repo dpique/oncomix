@@ -4,35 +4,37 @@
 \alias{topGeneQuants}
 \title{Identify genes that meet pre-specified quantiles}
 \usage{
-topGeneQuants(mmParams, deltMu2Thresh = 90, deltMu1Thresh = 10,
-  siThresh = 0.99)
+topGeneQuants(mmParams, deltMu2Thr = 90, deltMu1Thr = 10, siThr = 0.99)
 }
 \arguments{
 \item{mmParams}{The output from the mixModelParams function.}
 
-\item{deltMu2Thresh}{The percentile threshold for the deltaMu2 statistic.
+\item{deltMu2Thr}{The percentile threshold for the deltaMu2 statistic.
 All genes exceeding this percentile threshold will be selected.}
 
-\item{deltMu1Thresh}{The percentile threshold for the deltaMu1 statistic.
+\item{deltMu1Thr}{The percentile threshold for the deltaMu1 statistic.
 All genes exceeding this percentile threshold will be selected.}
 
-\item{siThresh}{The threshold for the selectivity index statistic (between 0 - 1).
-All genes exceeding this threshold will be selected.}
+\item{siThr}{The threshold for the selectivity index statistic
+(between 0-1). All genes exceeding this threshold will be selected.}
 }
 \value{
-Returns a dataframe containing all genes meeting the prespecified thresholds.
+Returns a dataframe containing all genes meeting the prespecified
+thresholds.
 }
 \description{
-This function allows you to subset genes that are above pre-specified quantiles
-and that most closely resemble the distribution of oncogenes.
+This function allows you to subset genes that are above pre-specified
+quantiles and that most closely resemble the distribution of oncogenes.
 }
 \examples{
-dfNml <- as.data.frame(matrix(data=rgamma(n=150, shape=2, rate=2), nrow=15, ncol=10))
-rownames(dfNml) <- paste0("patient.n", 1:nrow(dfNml))
+dfNml <- as.data.frame(matrix(data=rgamma(n=150, shape=2, rate=2),
+nrow=15, ncol=10))
+rownames(dfNml) <- paste0("patient_n", 1:nrow(dfNml))
 colnames(dfNml) <- paste0("gene", 1:ncol(dfNml))
 
-dfTumor <- as.data.frame(matrix(data=rgamma(n=150, shape=4, rate=3), nrow=15, ncol=10))
-rownames(dfTumor) <- paste0("patient.t", 1:nrow(dfTumor))
+dfTumor <- as.data.frame(matrix(data=rgamma(n=150, shape=4, rate=3),
+nrow=15, ncol=10))
+rownames(dfTumor) <- paste0("patient_t", 1:nrow(dfTumor))
 colnames(dfTumor) <- paste0("gene", 1:ncol(dfTumor))
 
 mmParams <- mixModelParams(dfNml, dfTumor)

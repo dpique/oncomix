@@ -3,9 +3,9 @@
 \docType{data}
 \name{dfNmlIsof}
 \alias{dfNmlIsof}
-\title{Human Breast Cancer RNA-sequencing data from TCGA - Adjacent Normal Tissue}
+\title{Human Breast Cancer RNA-sequencing data from TCGA - Adj. Normal Tissue}
 \description{
-Human Breast Cancer RNA-sequencing data from TCGA - Adjacent Normal Tissue
+Human Breast Cancer RNA-sequencing data from TCGA - Adj. Normal Tissue
 }
 \references{
 \url{https://gdc.cancer.gov/}

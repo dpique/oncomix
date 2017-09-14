@@ -2,12 +2,16 @@
 % Please edit documentation in R/oncoMix_examples.R
 \name{oncoMixBimodal}
 \alias{oncoMixBimodal}
-\title{Creating an schematic of a 2-component mixture model}
+\title{Creating a schematic of a 2-component mixture model}
 \usage{
 oncoMixBimodal(oe_means = c(3, 7))
 }
 \arguments{
 \item{oe_means}{Set the values for the difference between parameter means}
+}
+\value{
+Returns a ggplot object that shows a 2-component Gaussian mixture
+model
 }
 \description{
 This function allows you to generate a plot
