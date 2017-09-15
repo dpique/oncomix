@@ -1,5 +1,5 @@
 ---
-title: "OncoMix Vignette"
+title: "Oncomix Vignette"
 author: "Daniel G. Piqué"
 date: "`r Sys.Date()`"
 output:
@@ -20,16 +20,16 @@ knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE)
 
 ## 1. Introduction
 
-### 1.1 Motivation for developing OncoMix
+### 1.1 Motivation for Developing Oncomix
 
 The advent of large, well-curated databases, such as the [genomic data
 commons](https://gdc.cancer.gov/), that contain RNA sequencing data from
 hundreds of patient tumors has made it possible to identify oncogene candidates
-solely based off of patterns present in mRNA expression data. OncoMix is the
+solely based off of patterns present in mRNA expression data. Oncomix is the
 first method developed to identify oncogenes in a visually-interpretable manner
 from RNA-sequencing data in large cohorts of patients.
 
-OncoMix is an R package for identifying oncogene candidates based off of
+Oncomix is an R package for identifying oncogene candidates based off of
 2-component Gaussian mixture models. It estimates parameters using the
 expectation maximization procedure as implemented in the R package mclust. This
 tutorial will demonstrate how to identify oncogene candidates from a set of mRNA
@@ -40,11 +40,14 @@ sequencing data. We start by loading the package:
 library(oncomix)
 ```
 
-We then pose the following question, the answer to which forms the basis for
-this method:
 
-### 1.2 What should the distribution of oncogene mRNA expression in a population
-of tumors and adjacent normal tissue ideally look like?
+### 1.2 Distribution of oncogene mRNA expression
+We first explore the idea of what an ideal oncogene should look like. It is
+known that oncogenes such as *ERBB2* are overexpressed in 15-20% of all breast
+cancer patients. In addition, oncogenes should not be expressed in normal
+tissue. Based on this line of reasoning, we formulate a model for the
+distribution of oncogene mRNA expression values in a population of both tumor
+(teal curves) and normal (red-orange curves) tissue:
 
 ```{r}
 library(ggplot2)
@@ -67,8 +70,7 @@ curve sitting in the middle of what really are 2 distinct clusters. Visually, we
 see that for a theoretical oncogene, there is a *subgroup* of tumors that
 overexpresses this gene relative to normal tissue.
 
-### 1.3 Conceptual comparison of oncomix to classical differential expression
-methods
+### 1.3 Comparison of Oncomix to Existing Differential Expression Methods
 
 We now conceptually compare oncomix to the techniques employed by traditional
 differential expression analysis (e.g. Student's t-test, as employed by
@@ -95,7 +97,7 @@ tissue.
 
 ## 2. Identifying Oncogene Candidates
 
-### 2.1 Loading example data and exploring the `mixModelParams` object
+### 2.1 Loading Example Data and Exploring the `mixModelParams` Object
 
 Now, we will load an example dataset that contains expression values for 4789
 mRNA isoforms obtained from paired samples of breast tumor (`dfTumorIsof`) and
@@ -127,55 +129,55 @@ according to the `score` column, with the first row containing the highest
 oncomix score (defined below). The meaning of the dataframe columns are
 described below:
 
-    - `nMu1` = the mean ($\mu$) of the Gaussian curve with the smaller mean
-    fit to the adjacent normal expression data (referred to as Mode 1).
-    - `nMu2` = the mean ($\mu$) of the Gaussian curve with the larger mean fit
-    to the adjacent normal expression data (referred to as Mode 2).
-    - `nVar` = the variance ($\sigma$) of the two Gaussian curves fit to the
-    adjacent normal expression data (fixed to be equal between the two curves)
-    - `nPi1` = the proportion of adjacent normal samples assigned to the
-    Gaussian curve with mean `nMu1`
+- `nMu1` = the mean ($\mu$) of the Gaussian curve with the smaller mean
+fit to the adjacent normal expression data (referred to as Mode 1).
+- `nMu2` = the mean ($\mu$) of the Gaussian curve with the larger mean fit
+to the adjacent normal expression data (referred to as Mode 2).
+- `nVar` = the variance ($\sigma$) of the two Gaussian curves fit to the
+adjacent normal expression data (fixed to be equal between the two curves)
+- `nPi1` = the proportion of adjacent normal samples assigned to the
+Gaussian curve with mean `nMu1`
 
-    - `tMu1` = the mean ($\mu$) of the Gaussian curve with the smaller mean
-    fit to the tumor expression data (referred to as Mode 1).
-    - `tMu2` = the mean ($\mu$) of the Gaussian curve with the larger mean fit
-    to the tumor expression data. (referred to as Mode 2).
-    - `tVar` = the variance ($\sigma$) of the two Gaussian curves fit to the
-    tumor expression data (fixed to be equal between the two curves).
-    - `tPi1` = the proportion of tumor samples assigned to the Gaussian curve
-    with mean `tMu1`.
+- `tMu1` = the mean ($\mu$) of the Gaussian curve with the smaller mean
+fit to the tumor expression data (referred to as Mode 1).
+- `tMu2` = the mean ($\mu$) of the Gaussian curve with the larger mean fit
+to the tumor expression data. (referred to as Mode 2).
+- `tVar` = the variance ($\sigma$) of the two Gaussian curves fit to the
+tumor expression data (fixed to be equal between the two curves).
+- `tPi1` = the proportion of tumor samples assigned to the Gaussian curve
+with mean `tMu1`.
 
-    - `deltaMu2` = the difference between the means of the two curves between
-    groups. `tMu2` - `nMu2`. May be negative or positive.
-    - `deltaMu1` = the difference between the means of the two curves between
-    groups. `tMu1` - `nMu1`. May be negative or positive.
-    - `SI` = the selectivity index, or the proportion of adjacent normal samples
-    with expression values less than the boundary defined by `tMu2` -
-    `tMu1`. The selectivity index for the ith gene is computed as:
+- `deltaMu2` = the difference between the means of the two curves between
+groups. `tMu2` - `nMu2`. May be negative or positive.
+- `deltaMu1` = the difference between the means of the two curves between
+groups. `tMu1` - `nMu1`. May be negative or positive.
+- `SI` = the selectivity index, or the proportion of adjacent normal samples
+with expression values less than the boundary defined by `tMu2` -
+`tMu1`. The selectivity index for the ith gene is computed as:
 
-    $$SI_i  = \frac{1}{N}\sum_{j=1}^N \Bigg\{ \begin{array}{ll} 1,~ if~x_{ij} <
-    \frac{\mu_{iLT}+\mu_{iHT}}{2}  \\ 
-    0, ~ otherwise 
-    \end{array},
-    $$
+$$SI_i  = \frac{1}{N}\sum_{j=1}^N \Bigg\{ \begin{array}{ll} 1,~ if~x_{ij} <
+\frac{\mu_{iLT}+\mu_{iHT}}{2}  \\ 
+0, ~ otherwise 
+\end{array},
+$$
 
-    - where $N$ is the number of adjacent normal samples, and $x_{ij}$ is the
-    expression value of the ith gene in the jth adjacent normal sample.
-    $\mu_{iHT}$ is the mean of higher/larger Gaussian from the ith gene in tumor
-    samples, and $\mu_{iLT}$ is the mean of the smaller/lower Gaussian from the
-    ith gene in the tumor samples.
+- where $N$ is the number of adjacent normal samples, and $x_{ij}$ is the
+expression value of the ith gene in the jth adjacent normal sample.
+$\mu_{iHT}$ is the mean of higher/larger Gaussian from the ith gene in tumor
+samples, and $\mu_{iLT}$ is the mean of the smaller/lower Gaussian from the
+ith gene in the tumor samples.
 
-    - `score` = The score for the $i^{th}$ gene is calculated as follows: 
-    $$score_i  = SI * [(\Delta\mu_{2i} - \Delta\mu_{1i}) - (var_{Ni} -
-    var_{Ti})] ~~~~~, $$
+- `score` = The score for the $i^{th}$ gene is calculated as follows: 
+$$score_i  = SI * [(\Delta\mu_{2i} - \Delta\mu_{1i}) - (var_{Ni} -
+var_{Ti})] ~~~~~, $$
 
-    - where $SI$ is the selectivity index described above, $\Delta\mu_{2i}$ and
-    $\Delta\mu_{1i}$ are as described above (equivalent to `deltaMu2` and
-    `deltaMu1`), $var_{Ni}$ is the common variance across the adjacent normal
-    samples (equivalent to `n.var`), and $var_{Ti}$ is the common variance
-    across the tumor samples (equivalent to `tVar`).
+- where $SI$ is the selectivity index described above, $\Delta\mu_{2i}$ and
+$\Delta\mu_{1i}$ are as described above (equivalent to `deltaMu2` and
+`deltaMu1`), $var_{Ni}$ is the common variance across the adjacent normal
+samples (equivalent to `n.var`), and $var_{Ti}$ is the common variance
+across the tumor samples (equivalent to `tVar`).
 
-### 2.3 Selecting genes that appear most like idealized oncogene candidate
+### 2.3 Selecting Genes that Appear Most like the Idealized Oncogene
 
 We can now use the `mmParams` dataframe to figure out which of our isoforms in
 our gene set are most similar in terms of their distribution to our ideal
@@ -207,9 +209,9 @@ mmParamsTop10 <- mmParams[1:10,]
 print(mmParamsTop10)
 ```
 
-## 3. Visualize the output
+## 3. Visualize the Output
 
-### 3.1 Visualize isoforms with a high SI & oncomix score
+### 3.1 Visualize Isoforms with a High SI & Oncomix Score
 
 Now, we will visualize the distribution of gene expression values for a
 particular isoform. Specifically, we will create a overlapping histogram of an
@@ -264,8 +266,7 @@ the scatterplot.
 scatterMixPlot(mmParams=mmParams, geneLabels=rownames(mmParamsTop10))
 ```
 
-### 3.2 Visualize the distribution of isoforms that map to oncogenes in an
-online database
+### 3.2 Visualize the Distribution of Isoforms that Map to Known Oncogenes
 
 We can check the distribution of the isoforms that map to known human oncogenes.
 To do this, we will use genes classified as oncogenes from the [ONGene
@@ -302,8 +303,8 @@ using an R interface to the public UCSC MySQL database. We'll show where the top
 ##        geneQ, " ;"))
 ##dbDisconnect(ucscGenome)
 
-##The database mapping ucsc symbols to gene symbols can be loaded without
-##accessing the internet as follows:
+##The database mapping ucsc symbols to gene symbols is loaded below,
+##without needing to access the internet.
 data(queryRes, package="oncomix")
 
 ##Merge the queryRes & mmParams dataframes
@@ -335,9 +336,9 @@ increased expression of the gene. mRNA overexpresion is one of several ways that
 an oncogene can drive tumor behavior, and it is this class of oncogenes that our
 method seeks to detect.
 
-### 3c. Visualize the distribution of the OncoMix score
+### 3c. Visualize the Distribution of the Oncomix Score
 
-Lastly, we will check the distribution of the OncoMix `score` across all gene
+Lastly, we will check the distribution of the oncomix `score` across all gene
 isoforms. The histograms are superimposed and are colored by whether the isoform
 maps to a gene in the ONGene database (orange, n = `r
 table(is.na(mmParamsMg$geneSymbol))[1]`) or not (purple, n = `r
@@ -354,7 +355,7 @@ ggplot(mmParamsMg, aes(x=score, y=..density.., fill=is.na(geneSymbol))) +
     theme_classic() + xlab("OncoMix Score") + theme_classic() 
 ```
 
-The distribution of the OncoMix scores looks equivalent between isoforms in the
+The distribution of the oncomix scores looks equivalent between isoforms in the
 ONGene database versus those not in the ONGene database. However, the short
 right tail of this distribution, which contains isoforms with high scores, also
 preferentially consists of isoforms that map to genes in the ONGene database. In

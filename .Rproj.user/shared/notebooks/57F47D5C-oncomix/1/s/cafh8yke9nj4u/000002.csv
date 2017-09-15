@@ -1,2 +1,0 @@
-"0","#devtools::install_github(""dpique/oncomix"", build_vignettes=T)"
-"0","library(oncomix)"
