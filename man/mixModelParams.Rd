@@ -39,5 +39,5 @@ colnames(dfTumor) <- paste0("gene", 1:ncol(dfTumor))
 mmParams <- mixModelParams(dfNml, dfTumor)
 }
 \keyword{mixture-model,}
-\keyword{oncoMix,}
+\keyword{oncomix,}
 \keyword{two-component}

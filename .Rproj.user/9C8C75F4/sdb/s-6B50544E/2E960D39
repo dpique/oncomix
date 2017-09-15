@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "\n\n2. Also when I do the \"scatterMixPlot\" function I get an error sometimes \nbut not always. The error is\nError in grid.Call.graphics(C_upviewport, as.integer(n)) :\ncannot pop the top-level viewport ('grid' and 'graphics' output mixed?)\nThis may be something wrong with my R. Do you get this? (edited)\n\n\n\n6. Do the functions \"oncoMixIdeal\" and \"oncoMixTraditionalDE\" \nhave any purposes besides showing theoretical distributions of \nhow your data would ideally look like? If not, just take a picture\nand put this in the vignette.\n\n",
+    "created" : 1505481583383.000,
+    "dirty" : true,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "3104954908",
+    "id" : "2E960D39",
+    "lastKnownWriteTime" : 7741528752872779598,
+    "last_content_update" : 1505493816092,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "tempName" : "Untitled2"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -8,13 +8,15 @@ scatterMixPlot(mmParams, selIndThresh = 1, geneLabels = NULL)
 }
 \arguments{
 \item{mmParams}{The output from the mixModelParams function. Will utilize
-the deltaMu2 and deltaMu1 rows}
+the deltaMu2 and deltaMu1 rows.}
 
 \item{selIndThresh}{This is the selectivity index threshold to use. All
-genes with SI values above this threshold will be highlighted in purple.}
+genes with SI values above this threshold will be highlighted in purple.
+Specify either selIndThresh or geneLabels (not both simultaneously).}
 
 \item{geneLabels}{A character vector of gene names used to label the
-genes with that name on the scatter plot.}
+genes with that name on the scatter plot. Specify either selIndThresh
+or geneLabels (not both simultaneously).}
 }
 \value{
 Returns a ggplot scatter object that can be plotted

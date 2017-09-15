@@ -10,7 +10,7 @@
 #' genes as columns
 #' @param dfTumor A dataframe of tumor data containing patients as rows and
 #' genes as columns
-#' @keywords oncoMix, mixture-model, two-component
+#' @keywords oncomix, mixture-model, two-component
 #' @return Returns a list of length 2, each element of which contains the
 #' parameters for the Normal or the Tumor data in a 3 x n matrix, where n
 #' is the number of patient samples
@@ -110,9 +110,9 @@ plotGeneHist <- function(mmParams, dfNml, dfTumor, isof){
         group=as.factor(type))) +
     theme_classic() +
     geom_histogram(data=subset(tidyDf,type == 1),fill="#F8766D",
-        alpha=0.2, aes(y=..density..)) +
+        alpha=0.2, aes(y=..density..), binwidth = .2) +
     geom_histogram(data=subset(tidyDf,type == 2),fill="#00BFC4",
-        alpha=0.2, aes(y=..density..)) +
+        alpha=0.2, aes(y=..density..), binwidth = .2) +
     geom_rug(alpha=0.3, show.legend=FALSE) +
     theme(axis.title.y=element_blank(),
         axis.text.y=element_blank(),
@@ -146,11 +146,13 @@ plotGeneHist <- function(mmParams, dfNml, dfTumor, isof){
 #' mixture models with equal variances
 #'
 #' @param mmParams The output from the mixModelParams function. Will utilize
-#' the deltaMu2 and deltaMu1 rows
+#' the deltaMu2 and deltaMu1 rows.
 #' @param selIndThresh This is the selectivity index threshold to use. All
 #' genes with SI values above this threshold will be highlighted in purple.
+#' Specify either selIndThresh or geneLabels (not both simultaneously).
 #' @param geneLabels A character vector of gene names used to label the
-#' genes with that name on the scatter plot.
+#' genes with that name on the scatter plot. Specify either selIndThresh
+#' or geneLabels (not both simultaneously).
 #' @keywords oncoMix, visualization, two-component
 #' @return Returns a ggplot scatter object that can be plotted
 #' @import ggplot2 ggrepel stats
@@ -286,5 +288,15 @@ NULL
 #' @author Daniel Pique \email{daniel.pique@med.einstein.yu.edu}
 #' @references \url{https://gdc.cancer.gov/}
 #' @keywords RNA expression, Breast Tissue
+
+NULL
+
+#' Oncogene Database Mapping Gene Symbol to UCSC ID (kgID)
+#'
+#' @name queryRes
+#' @docType data
+#' @author Daniel Pique \email{daniel.pique@med.einstein.yu.edu}
+#' @references \url{http://ongene.bioinfo-minzhao.org/ongene_human.txt}
+#' @keywords Oncogenes, Database
 
 NULL
