@@ -1,7 +1,7 @@
 Package: oncomix
 Title: Identifying Genes Overexpressed in Subsets of Tumors from Tumor-Normal mRNA
     Expression Data
-Version: 0.99.0
+Version: 0.99.1
 Author: Daniel Pique, John Greally, Jessica Mar
 Maintainer: Daniel Pique <daniel.pique@med.einstein.yu.edu>
 Description: This package helps identify mRNAs that are overexpressed in subsets
