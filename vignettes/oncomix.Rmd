@@ -101,26 +101,26 @@ tissue.
 ### 2.1 Loading Example Data and Exploring the `mixModelParams` Object
 
 Now, we will load an example dataset that contains expression values for 700 
-mRNA isoforms obtained from paired samples of breast tumor (`dfTumorIsof`) and 
-adjacent normal(`dfNmlIsof`) breast tissue from 113 patients in the [Genomic
+mRNA isoforms obtained from paired samples of breast tumor (`exprTumIsof`) and 
+adjacent normal(`exprNmlIsof`) breast tissue from 113 patients in the [Genomic
 Data Commons](https://gdc.cancer.gov/).  We will fit the mixture model using the
 oncomix function `mixModelParams`, which takes dataframes that contain patients
 as rows and mRNA isoforms/genes as columns. The number of columns (genes) should
 be the same between both dataframes, though the number of rows can vary.
 
 ```{r}
-data(dfNmlIsof, dfTumorIsof, package="oncomix")
+data(exprNmlIsof, exprTumIsof, package="oncomix")
 
 ##look at the matrix of mRNA expression data from adjacent normal samples
-dim(dfNmlIsof)
-dfNmlIsof[1:5, 1:5] 
+dim(exprNmlIsof)
+exprNmlIsof[1:5, 1:5] 
 
 ##look at the matrix of mRNA expression data from tumors
-dim(dfTumorIsof)
-dfTumorIsof[1:5, 1:5] 
+dim(exprTumIsof)
+exprTumIsof[1:5, 1:5] 
 
 ##fits the mixture models, will take a few minutes
-mmParams <- mixModelParams(dfNmlIsof, dfTumorIsof) 
+mmParams <- mixModelParams(exprNmlIsof, exprTumIsof) 
 head(mmParams)
 ```
 
@@ -225,7 +225,7 @@ theoretical oncogene that most other isoforms in this dataset.
 
 ```{r}
 isof = "uc002jxc.2"
-plotGeneHist(mmParams, dfNmlIsof, dfTumorIsof, isof)
+plotGeneHist(mmParams, exprNmlIsof, exprTumIsof, isof)
 ```
 
 Next, we will create a scatterplot with the axes corresponding to the 

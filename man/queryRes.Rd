@@ -5,13 +5,16 @@
 \alias{queryRes}
 \title{Oncogene Database Mapping Gene Symbol to UCSC ID (kgID)}
 \description{
-Oncogene Database Mapping Gene Symbol to UCSC ID (kgID)
+These data were downloaded in September 2017 from the url listed below and
+represent a mapping between gene symbols in ongene, an oncogene database
+curated from the scientific literature, and gene identifiers from the
+University of California, Santa Cruz's genomic database.
 }
 \references{
 \url{http://ongene.bioinfo-minzhao.org/ongene_human.txt}
 }
 \author{
-Daniel Pique \email{daniel.pique@med.einstein.yu.edu}
+Min Zhao \email{mzhao@usc.edu.au}
 }
 \keyword{Database}
 \keyword{Oncogenes,}

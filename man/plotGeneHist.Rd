@@ -5,14 +5,16 @@
 \title{Plot a histogram of gene expression values from
 tumor and adjacent normal tissue.}
 \usage{
-plotGeneHist(mmParams, dfNml, dfTumor, isof)
+plotGeneHist(mmParams, exprNml, exprTum, isof)
 }
 \arguments{
 \item{mmParams}{The output from the getMixModelParams function.}
 
-\item{dfNml}{The normal dataframe.}
+\item{exprNml}{A dataframe (S3 or S4), matrix, or SummarizedExperiment object
+containing normal data with patients as columns and genes as rows.}
 
-\item{dfTumor}{The tumor dataframe.}
+\item{exprTum}{A dataframe (S3 or S4), matrix, or SummarizedExperiment object
+containing tumor data with patients as columns and genes as rows.}
 
 \item{isof}{The gene isoform to visualize}
 }
@@ -26,19 +28,18 @@ tumor and adjacent normal tissue with the option of including the best
 fitting Gaussian curve.
 }
 \examples{
-dfNml <- as.data.frame(matrix(data=rgamma(n=150, shape=2, rate=2),
-nrow=15, ncol=10))
-rownames(dfNml) <- paste0("patientN", 1:nrow(dfNml))
-colnames(dfNml) <- paste0("gene", 1:ncol(dfNml))
+exprNml <- as.data.frame(matrix(data=rgamma(n=150, shape=2, rate=2),
+nrow=10, ncol=15))
+colnames(exprNml) <- paste0("patientN", seq_len(ncol(exprNml)))
+rownames(exprNml) <- paste0("gene", seq_len(nrow(exprNml)))
 
-dfTumor <- as.data.frame(matrix(data=rgamma(n=150, shape=4, rate=3),
-nrow=15, ncol=10))
-rownames(dfTumor) <- paste0("patientT", 1:nrow(dfTumor))
-colnames(dfTumor) <- paste0("gene", 1:ncol(dfTumor))
-
-mmParams <- mixModelParams(dfNml, dfTumor)
+exprTum <- as.data.frame(matrix(data=rgamma(n=150, shape=4, rate=3),
+nrow=10, ncol=15))
+colnames(exprTum) <- paste0("patientT", seq_len(ncol(exprTum)))
+rownames(exprTum) <- paste0("gene", seq_len(nrow(exprTum)))
+mmParams <- mixModelParams(exprNml, exprTum)
 isof <- rownames(mmParams)[1]
-plotGeneHist(mmParams, dfNml, dfTumor, isof)
+plotGeneHist(mmParams, exprNml, exprTum, isof)
 }
 \seealso{
 \code{\link{mixModelParams}}

@@ -1,0 +1,6 @@
+"0","prot <- GDCquery(project = ""TCGA-UCEC"",
+               platform = ""MDA RPPA Core"")# #""MDA_RPPA_Core""
+"
+"2","Error in GDCquery(project = ""TCGA-UCEC"", platform = ""MDA RPPA Core"") : 
+  could not find function ""GDCquery""
+"

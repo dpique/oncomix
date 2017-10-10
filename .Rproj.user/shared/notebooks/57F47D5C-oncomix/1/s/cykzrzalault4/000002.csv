@@ -1,3 +1,0 @@
-"0","topGeneQuant <- topGeneQuants(mmParams, deltMu2Thr=99, "
-"0","    deltMu1Thr=10, siThr=.99)"
-"0","print(topGeneQuant)"

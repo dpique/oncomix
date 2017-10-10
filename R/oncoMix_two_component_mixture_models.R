@@ -1,3 +1,36 @@
+#' Convert SummarizedExperiment or Dataframe to Matrix
+#'
+#' This internal function converts SummarizedExperiment objects and dataframes
+#' (both S3 and S4) to matrices of expression values. Used within oncomix
+#' functions to convert all matrix-like objects to the matrix class.
+#'
+#' @param m Can be a matrix, a data.frame, a DataFrame, or
+#' SummarizedExperiment object.
+#' @export
+#' @keywords internal
+#' @importFrom SummarizedExperiment assay
+#' @return A matrix of expression values
+#' @examples
+#' m <- as.data.frame(matrix(data=rgamma(n=150, shape=2, rate=2),
+#' nrow=10, ncol=15))
+#' m <- toMatrix(m)
+
+toMatrix <- function(m){
+    if(class(m) == "matrix"){
+        return(m)
+    }
+    if(class(m) == "SummarizedExperiment"){
+        m <- assay(m)
+        return(m)
+    }
+    if(class(m) == "data.frame" | class(m) == "DataFrame"){
+        m <- as.matrix(m)
+        return(m)
+    }
+}
+
+
+
 #' Generate the parameters for two 2-component Gaussian mixture models
 #' with equal variances
 #'
@@ -6,38 +39,42 @@
 #' a priori labels (eg tumor vs normal.) This application was originally
 #' intended for matrices of gene expression data treated with 2 conditions.
 #'
-#' @param dfNml A dataframe of normal data containing patients as rows and
-#' genes as columns
-#' @param dfTumor A dataframe of tumor data containing patients as rows and
-#' genes as columns
+#' @param exprNml A dataframe (S3 or S4), matrix, or SummarizedExperiment object
+#'   containing normal data with patients as columns and genes as rows.
+#' @param exprTum A dataframe (S3 or S4), matrix, or SummarizedExperiment object
+#'   containing tumor data with patients as columns and genes as rows.
 #' @keywords oncomix, mixture-model, two-component
-#' @return Returns a list of length 2, each element of which contains the
-#' parameters for the Normal or the Tumor data in a 3 x n matrix, where n
-#' is the number of patient samples
+#' @return Returns a dataframe, each element of which contains the 12 mixture
+#' model parameters for each gene in an n x 12 matrix, where n is the number
+#' of genes.
 #' @importFrom mclust Mclust mclustBIC
 #' @export
 #' @examples
-#' dfNml <- as.data.frame(matrix(data=rgamma(n=150, shape=2, rate=2),
-#' nrow=15, ncol=10))
-#' rownames(dfNml) <- paste0("patientN", 1:nrow(dfNml))
-#' colnames(dfNml) <- paste0("gene", 1:ncol(dfNml))
+#' exprNml <- as.data.frame(matrix(data=rgamma(n=150, shape=2, rate=2),
+#' nrow=10, ncol=15))
+#' colnames(exprNml) <- paste0("patientN", seq_len(ncol(exprNml)))
+#' rownames(exprNml) <- paste0("gene", seq_len(nrow(exprNml)))
 #'
-#' dfTumor <- as.data.frame(matrix(data=rgamma(n=150, shape=4, rate=3),
-#' nrow=15, ncol=10))
-#' rownames(dfTumor) <- paste0("patientT", 1:nrow(dfTumor))
-#' colnames(dfTumor) <- paste0("gene", 1:ncol(dfTumor))
+#' exprTum <- as.data.frame(matrix(data=rgamma(n=150, shape=4, rate=3),
+#' nrow=10, ncol=15))
+#' colnames(exprTum) <- paste0("patientT", seq_len(ncol(exprTum)))
+#' rownames(exprTum) <- paste0("gene", seq_len(nrow(exprTum)))
 #'
-#' mmParams <- mixModelParams(dfNml, dfTumor)
+#' mmParams <- mixModelParams(exprNml, exprTum)
 
-mixModelParams <- function(dfNml, dfTumor) {
-    paramsNormal <- apply(dfNml, 2, function(x) {
+mixModelParams <- function(exprNml, exprTum) {
+
+    exprNml <- toMatrix(exprNml)
+    exprTum <- toMatrix(exprTum)
+
+    paramsNormal <- apply(exprNml, 1, function(x) {
         y <- mclust::Mclust(data=x, G=2, modelNames="E", verbose=FALSE)
         z <- c(nMu=y$parameters$mean,
             nVar=y$parameters$variance$sigmasq,
             nPi1=y$parameters$pro[1])
         return(z)})
 
-    paramsTumor <- apply(dfTumor, 2, function(x) {
+    paramsTumor <- apply(exprTum, 1, function(x) {
         y <- mclust::Mclust(data=x, G=2, modelNames="E", verbose=FALSE)
         z <- c(tMu=y$parameters$mean,
             tVar=y$parameters$variance$sigmasq,
@@ -54,8 +91,8 @@ mixModelParams <- function(dfNml, dfTumor) {
         x <- sum(boundTumor > vectNml) / length(vectNml)
         return(x)
     }
-    SI <- sapply(1:ncol(dfNml),
-            function(i) siCalc(dfNml[,i], boundaryTumor[i]))
+    SI <- sapply(seq_len(nrow(exprNml)),
+            function(i) siCalc(exprNml[i, ], boundaryTumor[i]))
 
     params <- rbind(params, deltaMu2, deltaMu1, SI)
     mmParamsDf <- data.frame(t(params))
@@ -76,32 +113,38 @@ mixModelParams <- function(dfNml, dfTumor) {
 #' fitting Gaussian curve.
 #'
 #' @param mmParams The output from the getMixModelParams function.
-#' @param dfNml The normal dataframe.
-#' @param dfTumor The tumor dataframe.
+#' @param exprNml A dataframe (S3 or S4), matrix, or SummarizedExperiment object
+#'   containing normal data with patients as columns and genes as rows.
+#' @param exprTum A dataframe (S3 or S4), matrix, or SummarizedExperiment object
+#'   containing tumor data with patients as columns and genes as rows.
 #' @param isof The gene isoform to visualize
 #' @keywords oncoMix, visualization, Gaussian, two-component
 #' @return Returns a histogram of the gene expression
 #' values from the two groups.
 #' @export
 #' @examples
-#' dfNml <- as.data.frame(matrix(data=rgamma(n=150, shape=2, rate=2),
-#' nrow=15, ncol=10))
-#' rownames(dfNml) <- paste0("patientN", 1:nrow(dfNml))
-#' colnames(dfNml) <- paste0("gene", 1:ncol(dfNml))
+#' exprNml <- as.data.frame(matrix(data=rgamma(n=150, shape=2, rate=2),
+#' nrow=10, ncol=15))
+#' colnames(exprNml) <- paste0("patientN", seq_len(ncol(exprNml)))
+#' rownames(exprNml) <- paste0("gene", seq_len(nrow(exprNml)))
 #'
-#' dfTumor <- as.data.frame(matrix(data=rgamma(n=150, shape=4, rate=3),
-#' nrow=15, ncol=10))
-#' rownames(dfTumor) <- paste0("patientT", 1:nrow(dfTumor))
-#' colnames(dfTumor) <- paste0("gene", 1:ncol(dfTumor))
-#'
-#' mmParams <- mixModelParams(dfNml, dfTumor)
+#' exprTum <- as.data.frame(matrix(data=rgamma(n=150, shape=4, rate=3),
+#' nrow=10, ncol=15))
+#' colnames(exprTum) <- paste0("patientT", seq_len(ncol(exprTum)))
+#' rownames(exprTum) <- paste0("gene", seq_len(nrow(exprTum)))
+
+#' mmParams <- mixModelParams(exprNml, exprTum)
 #' isof <- rownames(mmParams)[1]
-#' plotGeneHist(mmParams, dfNml, dfTumor, isof)
+#' plotGeneHist(mmParams, exprNml, exprTum, isof)
 #' @seealso \code{\link{mixModelParams}}
 
-plotGeneHist <- function(mmParams, dfNml, dfTumor, isof){
-    tidyDf <- as.data.frame(cbind(as.numeric(c(dfTumor[,isof], dfNml[,isof])),
-        as.factor(c(rep("tumor",nrow(dfTumor)), rep("normal",nrow(dfNml))))),
+plotGeneHist <- function(mmParams, exprNml, exprTum, isof){
+
+    exprNml <- toMatrix(exprNml)
+    exprTum <- toMatrix(exprTum)
+
+    tidyDf <- as.data.frame(cbind(as.numeric(c(exprTum[isof,], exprNml[isof,])),
+        as.factor(c(rep("tumor",ncol(exprTum)), rep("normal",ncol(exprNml))))),
         stringsAsFactors=FALSE)
     colnames(tidyDf) <- c("expr", "type")
     expr <- type <- ..density.. <- NULL # Setting the variables to NULL first
@@ -159,17 +202,17 @@ plotGeneHist <- function(mmParams, dfNml, dfTumor, isof){
 #' @importFrom RColorBrewer brewer.pal
 #' @export
 #' @examples
-#' dfNml <- as.data.frame(matrix(data=rgamma(n=150, shape=2, rate=2),
-#' nrow=15, ncol=10))
-#' rownames(dfNml) <- paste0("patientN", 1:nrow(dfNml))
-#' colnames(dfNml) <- paste0("gene", 1:ncol(dfNml))
+#' exprNml <- as.data.frame(matrix(data=rgamma(n=150, shape=2, rate=2),
+#' nrow=10, ncol=15))
+#' colnames(exprNml) <- paste0("patientN", seq_len(ncol(exprNml)))
+#' rownames(exprNml) <- paste0("gene", seq_len(nrow(exprNml)))
 #'
-#' dfTumor <- as.data.frame(matrix(data=rgamma(n=150, shape=4, rate=3),
-#' nrow=15, ncol=10))
-#' rownames(dfTumor) <- paste0("patientT", 1:nrow(dfTumor))
-#' colnames(dfTumor) <- paste0("gene", 1:ncol(dfTumor))
+#' exprTum <- as.data.frame(matrix(data=rgamma(n=150, shape=4, rate=3),
+#' nrow=10, ncol=15))
+#' colnames(exprTum) <- paste0("patientT", seq_len(ncol(exprTum)))
+#' rownames(exprTum) <- paste0("gene", seq_len(nrow(exprTum)))
 #'
-#' mmParams <- mixModelParams(dfNml, dfTumor)
+#' mmParams <- mixModelParams(exprNml, exprTum)
 #' scatterMixPlot(mmParams)
 #' @seealso \code{\link{mixModelParams}}
 
@@ -243,17 +286,17 @@ scatterMixPlot <- function(mmParams, selIndThresh=1, geneLabels=NULL){
 #' @import ggplot2 ggrepel stats
 #' @export
 #' @examples
-#' dfNml <- as.data.frame(matrix(data=rgamma(n=150, shape=2, rate=2),
-#' nrow=15, ncol=10))
-#' rownames(dfNml) <- paste0("patient_n", 1:nrow(dfNml))
-#' colnames(dfNml) <- paste0("gene", 1:ncol(dfNml))
+#' exprNml <- as.data.frame(matrix(data=rgamma(n=150, shape=2, rate=2),
+#' nrow=10, ncol=15))
+#' colnames(exprNml) <- paste0("patientN", seq_len(ncol(exprNml)))
+#' rownames(exprNml) <- paste0("gene", seq_len(nrow(exprNml)))
 #'
-#' dfTumor <- as.data.frame(matrix(data=rgamma(n=150, shape=4, rate=3),
-#' nrow=15, ncol=10))
-#' rownames(dfTumor) <- paste0("patient_t", 1:nrow(dfTumor))
-#' colnames(dfTumor) <- paste0("gene", 1:ncol(dfTumor))
+#' exprTum <- as.data.frame(matrix(data=rgamma(n=150, shape=4, rate=3),
+#' nrow=10, ncol=15))
+#' colnames(exprTum) <- paste0("patientT", seq_len(ncol(exprTum)))
+#' rownames(exprTum) <- paste0("gene", seq_len(nrow(exprTum)))
 #'
-#' mmParams <- mixModelParams(dfNml, dfTumor)
+#' mmParams <- mixModelParams(exprNml, exprTum)
 #' topGeneQuants(mmParams)
 #' @seealso \code{\link{mixModelParams}}
 
@@ -272,7 +315,17 @@ topGeneQuants <- function(mmParams, deltMu2Thr=90, deltMu1Thr=10, siThr=.99){
 
 #' Human Breast Cancer RNA-sequencing data from TCGA - Tumor Tissue
 #'
-#' @name dfTumorIsof
+#' These RNA-sequencing expression data were obtained from the Cancer Genome
+#' Atlas project (now the Genomic Data Commons (GDC)). The sequencing data were
+#' generated from breast carcinoma samples from 113 patients. Quantification of
+#' RNA expression values was performed using standard GDC pipelines. The
+#' expression values are reported in transcripts per million reads. Out of an
+#' initial 73,599 RNA transcripts, 700 are included as part of this dataset.
+#' These 700 transcripts represent a random subset of the transcripts with at
+#' least 20% non-zero expression values across all patient samples. Rows contain
+#' anonymized patient identifiers, while columns contain UCSC gene symbols.
+#'
+#' @name exprTumIsof
 #' @docType data
 #' @author Daniel Pique \email{daniel.pique@med.einstein.yu.edu}
 #' @references \url{https://gdc.cancer.gov/}
@@ -283,7 +336,19 @@ NULL
 
 #' Human Breast Cancer RNA-sequencing data from TCGA - Adj. Normal Tissue
 #'
-#' @name dfNmlIsof
+#' These RNA-sequencing expression data were obtained from the Cancer Genome
+#' Atlas project (now the Genomic Data Commons (GDC)). The sequencing data were
+#' generated from adjacent normal breast tissue data from 113 patients with
+#' breast cancer. Quantification of RNA expression values was performed using
+#' standard GDC pipelines. The expression values are reported in transcripts per
+#' million reads. Out of an initial 73,599 RNA transcripts, 700 are included as
+#' part of this dataset. These 700 transcripts represent a random subset of the
+#' transcripts with at least 20% non-zero expression values across all patient
+#' samples. Rows contain anonymized patient identifiers, while columns contain
+#' UCSC gene symbols.
+#'
+#'
+#' @name exprNmlIsof
 #' @docType data
 #' @author Daniel Pique \email{daniel.pique@med.einstein.yu.edu}
 #' @references \url{https://gdc.cancer.gov/}
@@ -293,9 +358,14 @@ NULL
 
 #' Oncogene Database Mapping Gene Symbol to UCSC ID (kgID)
 #'
+#' These data were downloaded in September 2017 from the url listed below and
+#' represent a mapping between gene symbols in ongene, an oncogene database
+#' curated from the scientific literature, and gene identifiers from the
+#' University of California, Santa Cruz's genomic database.
+#'
 #' @name queryRes
 #' @docType data
-#' @author Daniel Pique \email{daniel.pique@med.einstein.yu.edu}
+#' @author Min Zhao \email{mzhao@usc.edu.au}
 #' @references \url{http://ongene.bioinfo-minzhao.org/ongene_human.txt}
 #' @keywords Oncogenes, Database
 

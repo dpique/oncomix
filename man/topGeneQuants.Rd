@@ -27,17 +27,17 @@ This function allows you to subset genes that are above pre-specified
 quantiles and that most closely resemble the distribution of oncogenes.
 }
 \examples{
-dfNml <- as.data.frame(matrix(data=rgamma(n=150, shape=2, rate=2),
-nrow=15, ncol=10))
-rownames(dfNml) <- paste0("patient_n", 1:nrow(dfNml))
-colnames(dfNml) <- paste0("gene", 1:ncol(dfNml))
+exprNml <- as.data.frame(matrix(data=rgamma(n=150, shape=2, rate=2),
+nrow=10, ncol=15))
+colnames(exprNml) <- paste0("patientN", seq_len(ncol(exprNml)))
+rownames(exprNml) <- paste0("gene", seq_len(nrow(exprNml)))
 
-dfTumor <- as.data.frame(matrix(data=rgamma(n=150, shape=4, rate=3),
-nrow=15, ncol=10))
-rownames(dfTumor) <- paste0("patient_t", 1:nrow(dfTumor))
-colnames(dfTumor) <- paste0("gene", 1:ncol(dfTumor))
+exprTum <- as.data.frame(matrix(data=rgamma(n=150, shape=4, rate=3),
+nrow=10, ncol=15))
+colnames(exprTum) <- paste0("patientT", seq_len(ncol(exprTum)))
+rownames(exprTum) <- paste0("gene", seq_len(nrow(exprTum)))
 
-mmParams <- mixModelParams(dfNml, dfTumor)
+mmParams <- mixModelParams(exprNml, exprTum)
 topGeneQuants(mmParams)
 }
 \seealso{

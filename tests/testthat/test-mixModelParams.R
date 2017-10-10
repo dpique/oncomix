@@ -1,6 +1,6 @@
 library(oncomix)
 context("output for mixModelParams")
-test_that("mixModelParams takes in and returns a DataFrame", {
+test_that("mixModelParams returns a data.frame", {
     dfNml <- as.data.frame(matrix(data=rgamma(n=150, shape=2, rate=2),
     nrow=15, ncol=10))
     rownames(dfNml) <- paste0("patientN", 1:nrow(dfNml))

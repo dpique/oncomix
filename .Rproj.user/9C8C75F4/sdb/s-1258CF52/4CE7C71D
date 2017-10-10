@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "library(oncomix)\ncontext(\"output for mixModelParams\")\ntest_that(\"mixModelParams returns a data.frame\", {\n    dfNml <- as.data.frame(matrix(data=rgamma(n=150, shape=2, rate=2),\n    nrow=15, ncol=10))\n    rownames(dfNml) <- paste0(\"patientN\", 1:nrow(dfNml))\n    colnames(dfNml) <- paste0(\"gene\", 1:ncol(dfNml))\n    dfTumor <- as.data.frame(matrix(data=rgamma(n=150, shape=4, rate=3),\n        nrow=15, ncol=10))\n    rownames(dfTumor) <- paste0(\"patientT\", 1:nrow(dfTumor))\n    colnames(dfTumor) <- paste0(\"gene\", 1:ncol(dfTumor))\n    mmParams <- mixModelParams(dfNml, dfTumor)\n    expect_true(is(mmParams, \"data.frame\")) #DataFrame\n})\n",
+    "created" : 1507487625760.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1605344487",
+    "id" : "4CE7C71D",
+    "lastKnownWriteTime" : 1507487678,
+    "last_content_update" : 1507487678343,
+    "path" : "//data.einsteinmed.org/users/Daniel Piqué/dpLabNotebook/bimodality_brca_tcga/oncomix/tests/testthat/test-mixModelParams.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
