@@ -66,7 +66,10 @@ mixModelParams <- function(exprNml, exprTum) {
 
     exprNml <- toMatrix(exprNml)
     exprTum <- toMatrix(exprTum)
-
+    if(all.equal(rownames(exprNml), rownames(exprTum)) != TRUE){
+      stop("Rownames are not equal btw the 2 matrices.")
+    }
+    geneNames <- rownames(exprNml)
     paramsNormal <- apply(exprNml, 1, function(x) {
         y <- mclust::Mclust(data=x, G=2, modelNames="E", verbose=FALSE)
         z <- c(nMu=y$parameters$mean,
@@ -100,8 +103,9 @@ mixModelParams <- function(exprNml, exprTum) {
     mmParamsDf$score <- mmParamsDf$SI*{
         (mmParamsDf$deltaMu2-mmParamsDf$deltaMu1)-
         (mmParamsDf$nVar+mmParamsDf$tVar)}
-    mmParamsDfS <- mmParamsDf[with(mmParamsDf, order(-score)), ]
-    return(mmParamsDfS)
+    rownames(mmParamsDf) <- geneNames
+    mmParamsDf <- mmParamsDf[with(mmParamsDf, order(-score)), ]
+    return(mmParamsDf)
 }
 
 
