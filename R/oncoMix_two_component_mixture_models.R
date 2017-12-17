@@ -142,7 +142,7 @@ mixModelParams <- function(exprNml, exprTum) {
 #' plotGeneHist(mmParams, exprNml, exprTum, isof)
 #' @seealso \code{\link{mixModelParams}}
 
-plotGeneHist <- function(mmParams, exprNml, exprTum, isof){
+plotGeneHist <- function(mmParams, exprNml, exprTum, isof, ...){
 
     exprNml <- toMatrix(exprNml)
     exprTum <- toMatrix(exprTum)
@@ -182,7 +182,7 @@ plotGeneHist <- function(mmParams, exprNml, exprTum, isof){
         sd=sqrt(mmParams[isof,"tVar"]))) +
     stat_function(fun="dnorm", colour="#00BFC4",
         args=list(mean=mmParams[isof,"tMu1"],
-        sd=sqrt(mmParams[isof,"tVar"])))
+        sd=sqrt(mmParams[isof,"tVar"]))) + ...
     print(p1)
 }
 
